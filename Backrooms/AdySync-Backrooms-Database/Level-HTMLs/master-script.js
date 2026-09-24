@@ -1,7 +1,3 @@
-const supabaseUrl = 'https://wmbvsbhbmryhzgktfxfz.supabase.co';
-const supabaseKey = 'sb_publishable_X47RHqCndZ9vdvVT_ZX4Jw_6X7fEHf_';
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
 const pathParts = window.location.pathname.split('/').filter(Boolean);
 const rawPageName = pathParts[pathParts.length - 1] || "level-0.html";
 const PAGE_ID = rawPageName.replace(/\.html$/i, '') || 'level-0';
@@ -16,81 +12,12 @@ function switchTab(tabId) {
     contents.forEach(content => content.classList.toggle('active', content.id === tabId));
 }
 
-async function renderLevel() {
-    const { data, error } = await supabaseClient
-        .from('levels')
-        .select('content')
-        .eq('id', PAGE_ID)
-        .single();
-
+function renderLevel() {
     const vId = document.getElementById('v-id');
-    if (error || !data) {
-        if (vId) vId.textContent = "Level Not Found";
-        return;
-    }
+    if (vId) vId.textContent = "Database Inactive";
 
-    const c = data.content;
-    const repoBase = '..';
-    
-    const imgElement = document.getElementById('v-image');
-    if (imgElement) {
-        let imgVal = c.imageFile || `${PAGE_ID}.png`;
-        if (imgVal.startsWith('http')) {
-            imgElement.src = imgVal;
-        } else {
-            const cleanName = imgVal.replace(/^\//, '');
-            const pathPrefix = cleanName.toLowerCase().startsWith('images/') ? '' : 'Images/';
-            imgElement.src = `${repoBase}/${pathPrefix}${cleanName}`;
-        }
-        imgElement.onerror = () => {
-            imgElement.src = `${repoBase}/Images/placeholder.png`;
-            imgElement.onerror = null;
-        };
-    }
-
-    if (vId) vId.textContent = c.title || PAGE_ID;
-    
     const vName = document.getElementById('v-name');
-    if (vName) vName.textContent = c.name || "";
-    
-    const vTags = document.getElementById('v-tags');
-    if (vTags) vTags.innerHTML = c.tagsHtml || "";
-    
-    const vStats = document.getElementById('v-stats');
-    if (vStats && c.statsHtml) vStats.innerHTML = c.statsHtml;
-
-    const hContainer = document.getElementById('v-tab-headers');
-    const cContainer = document.getElementById('v-tab-contents');
-
-    if (c.tabs?.length > 0 && hContainer && cContainer) {
-        const headerFrag = document.createDocumentFragment();
-        const contentFrag = document.createDocumentFragment();
-
-        c.tabs.forEach((tab, i) => {
-            const isActive = i === 0;
-            const tabId = `tab-${i}`;
-
-            const btn = document.createElement('button');
-            btn.className = `tab-button ${isActive ? 'active' : ''}`;
-            btn.dataset.tab = tabId;
-            btn.textContent = tab.name;
-            headerFrag.appendChild(btn);
-
-            const pane = document.createElement('div');
-            pane.className = `tab-content ${isActive ? 'active' : ''}`;
-            pane.id = tabId;
-            pane.innerHTML = tab.content;
-            contentFrag.appendChild(pane);
-        });
-
-        hContainer.replaceChildren(headerFrag);
-        cContainer.replaceChildren(contentFrag);
-
-        hContainer.onclick = (e) => {
-            const tabId = e.target.dataset.tab;
-            if (tabId) switchTab(tabId);
-        };
-    }
+    if (vName) vName.textContent = "Level content is no longer available.";
 }
 
 function searchText() {

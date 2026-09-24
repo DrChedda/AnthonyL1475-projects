@@ -1,9 +1,6 @@
 --- 
 permalink: /main/editor/editor-script.js
 ---
-const supabaseUrl = 'https://wmbvsbhbmryhzgktfxfz.supabase.co';
-const supabaseKey = 'sb_publishable_X47RHqCndZ9vdvVT_ZX4Jw_6X7fEHf_';
-const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 const quillInstances = {};
 let CURRENT_ID = new URLSearchParams(window.location.search).get('id') || 'level-0';
 
@@ -34,16 +31,8 @@ window.resetAuthUI = function() {
 };
 
 window.handleAuth = async function(mode) {
-    const email = getEl('email-field').value;
-    const password = getEl('password-field').value;
     const statusBox = getEl('auth-status');
-    
-    const { error } = (mode === 'login') 
-        ? await db.auth.signInWithPassword({ email, password })
-        : await db.auth.signUp({ email, password, options: { data: { creation_key: getEl('key-field').value } } });
-
-    if (error) statusBox.textContent = `ERROR: ${error.message}`;
-    else mode === 'login' ? window.checkUser() : (statusBox.textContent = "CHECK EMAIL FOR LINK");
+    statusBox.textContent = "DATABASE INACTIVE: AUTHENTICATION UNAVAILABLE";
 };
 
 window.handleAuthSubmit = function() {
@@ -52,29 +41,11 @@ window.handleAuthSubmit = function() {
 };
 
 window.handleLogout = async function() {
-    try {
-        const { error } = await db.auth.signOut();
-        if (error) throw error;
-        document.body.classList.remove('editor-active');
-        const url = new URL(window.location);
-        url.searchParams.delete('id');
-        window.history.replaceState({}, '', url);
-        location.reload();
-    } catch (err) {
-        console.error("Logout failed:", err.message);
-        alert("Logout Error: " + err.message);
-    }
+    alert("Database authentication is inactive.");
 };
 
 window.checkUser = async function() {
-    const { data: { user } } = await db.auth.getUser();
-    if (user) {
-        document.body.classList.add('editor-active');
-        getEl('login-overlay').style.display = 'none';
-        getEl('editor-ui').style.display = 'flex';
-        getEl('id-input').value = CURRENT_ID;
-        window.loadData();
-    }
+    getEl('auth-status').textContent = "DATABASE INACTIVE: EDITOR UNAVAILABLE";
 };
 
 window.switchPage = function() {
@@ -113,37 +84,11 @@ window.addTag = function() {
 };
 
 window.loadData = async function() {
-    const { data } = await db.from('levels').select('content').eq('id', CURRENT_ID).single();
-    const content = data?.content || {};
-    getEl('img-input').value = content.imageFile || `${CURRENT_ID}.png`;
-    window.updatePreview(getEl('img-input').value);
-    getEl('edit-lvl-id').textContent = content.title || CURRENT_ID;
-    getEl('edit-lvl-name').textContent = content.name || "";
-    getEl('edit-tags').innerHTML = content.tagsHtml || "";
-    getEl('edit-stats').innerHTML = content.statsHtml || "";
-    Object.keys(quillInstances).forEach(id => delete quillInstances[id]);
-    getEl('tab-headers').innerHTML = "";
-    getEl('tab-contents-container').innerHTML = "";
-    if (content.tabs?.length) {
-        content.tabs.forEach((t, i) => window.createNewTab(t.name, t.content, i === 0));
-    }
+    getEl('auth-status').textContent = "DATABASE INACTIVE: LEVEL DATA UNAVAILABLE";
 };
 
-window.saveToSupabase = async function() {
-    const tabs = Array.from(document.querySelectorAll('.tab-controls')).map(ctrl => ({
-        name: ctrl.querySelector('.tab-button').textContent,
-        content: quillInstances[ctrl.dataset.tabId].root.innerHTML
-    }));
-    const payload = {
-        title: getEl('edit-lvl-id').textContent,
-        name: getEl('edit-lvl-name').textContent,
-        tagsHtml: getEl('edit-tags').innerHTML,
-        statsHtml: getEl('edit-stats').innerHTML,
-        imageFile: getEl('img-input').value,
-        tabs
-    };
-    const { error } = await db.from('levels').upsert({ id: CURRENT_ID, content: payload });
-    alert(error ? `Error: ${error.message}` : `SUCCESS: Data pushed to ${CURRENT_ID}`);
+window.saveChanges = async function() {
+    alert("Database inactive: changes were not saved.");
 };
 
 window.setActiveTab = function(id) {

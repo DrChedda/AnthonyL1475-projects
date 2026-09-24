@@ -1,8 +1,3 @@
-// const SUPABASE_URL = 'https://zsmytsalkmtqlxflprnu.supabase.co';
-// const SUPABASE_KEY = 'sb_publishable_SD8kLVdtqkUpRMiUdwWBsQ_u0Gl0qOu';
-// const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-// Debug version doesn't connect to supabase
-
 let documents = [], currentCategory = 'All', currentPage = 1, editingDocId = null;
 const itemsPerPage = 10;
 
@@ -15,9 +10,7 @@ async function init() {
 }
 
 async function fetchDocuments() {
-    const { data, error } = await _supabase.from('documents').select('*');
-    if (error) return console.error('Fetch Error:', error.message);
-    documents = data;
+    documents = [];
     searchDocs();
 }
 
@@ -156,46 +149,7 @@ function handleDocClick(event, id, title) {
 }
 
 async function openViewer(id, title) {
-    const doc = documents.find(d => d.id === id);
-    if (!doc) return;
-
-    let securedUrl = null;
-
-    if (doc.access_required && doc.access_required !== 'Public') {
-        let savedPass = localStorage.getItem('highest_access_pass') || 
-                        localStorage.getItem(`pass_${doc.access_required}`) || '';
-
-        const userCode = await requestAccessCode(doc.access_required, savedPass);
-        if (!userCode) return;
-
-        const { data, error } = await _supabase.rpc('get_secure_url', { 
-            doc_id: id, 
-            provided_passcode: userCode.trim() 
-        });
-        
-        if (error || !data) {
-            unlockScroll();
-            return alert("ACCESS DENIED: Insufficient clearance level or invalid code.");
-        }
-        
-        localStorage.setItem('highest_access_pass', userCode.trim());
-        localStorage.setItem(`pass_${doc.access_required}`, userCode.trim());
-        securedUrl = data;
-    } else {
-        securedUrl = doc.url;
-    }
-
-    if (!securedUrl) return;
-
-    const modal = document.getElementById('viewerModal');
-    if (modal) {
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('docIframe').src = securedUrl.includes('docs.google.com') 
-            ? securedUrl.split('/edit')[0] + '/preview' 
-            : securedUrl;
-        modal.style.display = 'flex';
-        lockScroll();
-    }
+    alert("The database is inactive, so documents cannot be opened.");
 }
 
 function openInNewTab() {
@@ -213,29 +167,7 @@ function closeViewer() {
 // --- ADMIN LOGIC ---
 
 async function openAdmin() {
-    let savedPass = localStorage.getItem('admin_passcode') || '';
-
-    const passcode = await requestAccessCode("AC-X (Administrative)", savedPass);
-    
-    if (!passcode) return;
-
-    const { data: isAdmin, error: rpcError } = await _supabase.rpc('verify_admin', { 
-        passcode: passcode.trim() 
-    });
-
-    if (rpcError || !isAdmin) {
-        alert("ACCESS DENIED: Invalid Administrative Credentials.");
-        return;
-    }
-
-    localStorage.setItem('admin_passcode', passcode.trim());
-    window.adminKey = passcode.trim();
-    
-    const adminModal = document.getElementById('adminModal');
-    if (adminModal) {
-        adminModal.style.display = 'flex';
-        lockScroll();
-    }
+    alert("Database management is unavailable because the database is inactive.");
 }
 
 function closeAdmin() {
@@ -263,14 +195,7 @@ const setFormData = (doc = {}) => {
 };
 
 async function handleAdminAction(rpcName, payload, successMessage) {
-    const { data: success, error } = await _supabase.rpc(rpcName, { passcode: window.adminKey, ...payload });
-    if (error || !success) {
-        alert("Error: " + (error?.message || "Unauthorized"));
-    } else {
-        alert(successMessage);
-        resetAdminForm();
-        await fetchDocuments();
-    }
+    alert("This database is inactive, so changes cannot be saved.");
 }
 
 async function adminEditByUuid() {
@@ -280,19 +205,6 @@ async function adminEditByUuid() {
 
     editingDocId = id;
     let editUrl = doc.url;
-
-    if (doc.access_required !== 'Public') {
-        const { data, error } = await _supabase.rpc('admin_get_secure_url', { 
-            target_doc_id: id, 
-            admin_passcode: window.adminKey 
-        });
-        
-        if (error) {
-            console.error("Failed to fetch secure URL:", error.message);
-        } else if (data) {
-            editUrl = data;
-        }
-    }
 
     setFormData({ ...doc, url: editUrl });
     
