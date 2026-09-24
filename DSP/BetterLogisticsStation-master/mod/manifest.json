@@ -1,0 +1,10 @@
+{
+  "name": "BetterLogisticsStations",
+  "version_number": "1.0.0",
+  "description": "Provides configurations to adjust maximum item counts and maximum item kinds (number of slots) for planetary and interstellar logistics stations. Modifies handling of additional slots.",
+  "website_url": "https://github.com/Sebdalf/BetterLogisticsStation",
+  "dependencies": [
+    "xiaoye97-LDBTool-3.0.2",
+	"xiaoye97-BepInEx-5.4.17"
+  ]
+}
