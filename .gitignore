@@ -1,1 +1,11 @@
 **/.vscode/
+**/.DS_Store
+**/Thumbs.db
+
+**/node_modules/
+
+**/*.log
+**/npm-debug.log*
+
+**/.env
+**/.env.*
