@@ -27,10 +27,13 @@ button { cursor: pointer; }
 .app-shell { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 28px 0 24px; }
 .topbar, .scene-meta, .card-heading { display: flex; align-items: center; justify-content: space-between; }
 .topbar { gap: 22px; padding-bottom: 34px; }
+.topbar-right { display: flex; align-items: center; gap: 18px; margin-left: auto; }
 .brand { display: inline-flex; min-width: 0; align-items: center; gap: 10px; color: var(--ink); font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; }
 .brand-logo { width: 32px; height: 32px; flex: 0 0 32px; object-fit: contain; }
 .brand-name { color: var(--ink); }
 .brand-name:hover { color: var(--mint); }
+.projects-link { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: none; white-space: nowrap; }
+.projects-link:hover { color: var(--mint); }
 .load-warning { margin: 0 auto 20px; padding: 10px 12px; border: 1px solid #765044; border-radius: 4px; color: #f2c2b5; background: #2b1a17; font-size: 0.8rem; line-height: 1.4; }
 .round-status { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 5px rgba(231, 132, 101, 0.14); }
@@ -158,6 +161,7 @@ h1 { max-width: 610px; margin-bottom: 12px; font-family: Arial, Helvetica, sans-
 @media (max-width: 780px) {
   .app-shell { width: min(100% - 28px, 620px); padding-top: 18px; }
   .topbar { flex-wrap: wrap; gap: 14px; padding-bottom: 28px; }
+  .topbar-right { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
   .brand { flex: 1 1 auto; }
   .round-status { margin-left: auto; }
   .score-panel { margin-left: auto; }
