@@ -1,0 +1,11 @@
+{
+    "levelId": "Level-3",
+    "description": "Level-3, “Electrical Station” is one of the Main Nine levels of the Backrooms, a complex of brick halls and metal gates filled with heavy and electrical machinery, including boxes, wires and boilers. The halls are dimly lit, with some sections being devoid at light, making a light source more or less necessary for travel.",
+    "trelloUrl": "https://trello.com/c/Gpjfvdax/35-electrical-station",
+    "limit": 600,
+    "hasSectors": false,
+    "walls": [
+    ],
+    "locations": [
+    ]
+}

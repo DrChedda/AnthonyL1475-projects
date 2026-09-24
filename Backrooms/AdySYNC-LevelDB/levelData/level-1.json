@@ -1,0 +1,11 @@
+{
+    "levelId": "Level-1",
+    "description": "Level-1, “Parking Garage” is one of the Main Nine levels of the Backrooms; an expansive yet mostly empty parking lot, with the only noteable features being the M.E.G’s primary settlement, Ganzir. It has two floors and ascending/descending ramps.",
+    "trelloUrl": "https://trello.com/c/hYxxDoja/24-parking-garage",
+    "limit": 600,
+    "hasSectors": false,
+    "walls": [
+    ],
+    "locations": [
+    ]
+}

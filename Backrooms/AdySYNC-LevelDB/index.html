@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AdySYNC Level Database</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="map-app">
+      <div class="map-surface" id="mapSurface" aria-label="Backrooms map canvas">
+        <div class="map-world" id="mapWorld">
+          <div class="axis-overlay">
+            <div class="axis-line axis-line--vertical"></div>
+            <div class="axis-line axis-line--horizontal"></div>
+
+            <div class="world-border-line border-line--left" style="position: absolute; display: none;"></div>
+            <div class="world-border-line border-line--right" style="position: absolute; display: none;"></div>
+            <div class="world-border-line border-line--top" style="position: absolute; display: none;"></div>
+            <div class="world-border-line border-line--bottom" style="position: absolute; display: none;"></div>
+          </div>
+
+          <div class="walls-layer"></div>
+
+          <div class="labels-layer">
+            <div class="map-boundary-box" style="position: absolute; display: none;">
+              <div class="map-boundary-label top-left" style="position: absolute; top: 8px; left: 12px;">Walkable Space (2.1M)</div>
+              <div class="map-boundary-label bottom-right" style="position: absolute; bottom: 8px; right: 12px;">Walkable Space (2.1M)</div>
+            </div>
+          </div>
+
+          <div class="points-layer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-level-selector" aria-label="Level layer selection">
+      <div class="coord-readout" aria-label="Current coordinates">
+        <span class="coord-level-tag">Level-0</span>
+        <strong data-coordinate>X 0, Z 0</strong>
+      </div>
+      <div class="level-btn-group"></div>
+
+      <div class="notice">
+        Report issues to <strong>OfficialWallmartBag</strong>.
+      </div>
+    </div>
+
+    <aside class="sidebar" id="infoSidebar">
+      <div class="sidebar-scroll-wrapper">
+        <h2 class="sidebar-title" id="sidebarTitle">Select an Object</h2>
+        <div class="sidebar-divider"></div>
+        <p class="sidebar-desc" id="sidebarDesc">Click on something to see information about it.</p>
+        <div class="sidebar-trello-wrapper" id="sidebarTrello"></div>
+      </div>
+    </aside>
+
+    <script src="https://p.trellocdn.com/embed.min.js"></script>
+    <script src="map-handler.js"></script>
+    <script src="ui-controller.js"></script>
+    <script src="map-overlay.js"></script>
+    <script>
+      const levelBtnGroup = document.querySelector('.level-btn-group');
+
+      if (levelBtnGroup) {
+          levelBtnGroup.addEventListener('wheel', (e) => {
+              if (e.deltaY !== 0) {
+                  e.preventDefault();
+                  levelBtnGroup.scrollLeft += e.deltaY;
+              }
+          }, { passive: false });
+      }
+    </script>
+  </body>
+</html>

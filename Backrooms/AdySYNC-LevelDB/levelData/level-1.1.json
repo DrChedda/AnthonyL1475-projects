@@ -1,0 +1,11 @@
+{
+    "levelId": "Level-1.1",
+    "description": "Level-1.1 is a sub-level of Level-1, “Parking Garage”. It appears to be a more run-down variant of the main level, with the area flooded by knee-deep water and a clear lack of maintenance or care.",
+    "trelloUrl": "https://trello.com/c/i25E8qpy/139-non-habitable-zone",
+    "limit": 600,
+    "hasSectors": false,
+    "walls": [
+    ],
+    "locations": [
+    ]
+}

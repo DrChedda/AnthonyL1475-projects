@@ -1,0 +1,11 @@
+{
+    "levelId": "Level-2",
+    "description": "Level-2, “Pipe Dreams” (also known as the “Abandoned Utility Halls”) is one of the Main Nine levels of the Backrooms; a series of hallways lined with steam pipes and other utility architecture. It is often recalled for its claustrophobic and heated environment, caused by the tight spaces being filled with steam from breached pipelines.",
+    "trelloUrl": "https://trello.com/c/teiOzvTI/81-pipe-dreams",
+    "limit": 600,
+    "hasSectors": false,
+    "walls": [
+    ],
+    "locations": [
+    ]
+}
