@@ -1,0 +1,188 @@
+[
+  {
+    "id": "level-0-001",
+    "question": "Where is Lion Den",
+    "target": { "x": -153, "z": -200 },
+    "answer": "Lions Den"
+  },
+  {
+    "id": "level-0-002",
+    "question": "Where is Mold Bastion",
+    "target": { "x": 6045, "z": 648 },
+    "answer": "Mold Bastion"
+  },
+  {
+    "id": "level-0-003",
+    "question": "Where is the Deadzone",
+    "target": { "x": -5863, "z": 5475 },
+    "answer": "Deadzone"
+  },
+  {
+    "id": "level-0-004",
+    "question": "Where is Point 7890",
+    "target": { "x": 7890, "z": 7890 },
+    "answer": "Point 7890"
+  },
+  {
+    "id": "level-0-005",
+    "question": "Where is the Oldgen Region",
+    "target": { "x": -6420, "z": 1950 },
+    "answer": "Oldgen Region"
+  },
+  {
+    "id": "level-0-006",
+    "question": "Where is Project Phaserunner (PPR)",
+    "target": { "x": -430, "z": -699 },
+    "answer": "Project Phaserunner (PPR)"
+  },
+  {
+    "id": "level-0-007",
+    "question": "Where is the Infinitelands Megastructure",
+    "target": { "x": 2032, "z": 7457 },
+    "answer": "Infinitelands Megastructure"
+  },
+  {
+    "id": "level-0-008",
+    "question": "Where is the Level-0.35 entrance",
+    "target": { "x": 5000, "z": 3700 },
+    "answer": "Level-0.35 \"The Elder's Grave\" Entrance"
+  },
+  {
+    "id": "level-0-009",
+    "question": "Where is the Level Fun entrance",
+    "target": { "x": 39, "z": -3724 },
+    "answer": "Level Fun Entrance"
+  },
+  {
+    "id": "level-0-010",
+    "question": "Where are the Noclipping Pitfalls",
+    "target": { "x": 755, "z": -2773 },
+    "answer": "Noclipping Pitfalls"
+  },
+  {
+    "id": "level-0-011",
+    "question": "Where is the Glitch House",
+    "target": { "x": 7500, "z": 980 },
+    "answer": "Glitch House"
+  },
+  {
+    "id": "level-0-012",
+    "question": "Where is The Cinema",
+    "target": { "x": 412, "z": 2919 },
+    "answer": "The Cinema"
+  },
+  {
+    "id": "level-0-013",
+    "question": "Where is Pearley's Den (Dead Den)",
+    "target": { "x": 6094, "z": -1752 },
+    "answer": "Pearley's Den (Dead Den)"
+  },
+  {
+    "id": "level-0-014",
+    "question": "Where is Calm",
+    "target": { "x": -2758, "z": 1027 },
+    "answer": "Calm"
+  },
+  {
+    "id": "level-0-015",
+    "question": "Where is the Sinkhole",
+    "target": { "x": -389, "z": 5634 },
+    "answer": "Sinkhole"
+  },
+  {
+    "id": "level-0-016",
+    "question": "Where is The Final Stop",
+    "target": { "x": 2900, "z": -150 },
+    "answer": "The Final Stop"
+  },
+  {
+    "id": "level-0-017",
+    "question": "Where is the Crawlspace Labyrinth",
+    "target": { "x": -3730, "z": -6240 },
+    "answer": "Crawlspace Labyrinth"
+  },
+  {
+    "id": "level-0-018",
+    "question": "Where is the Vending Machine Place",
+    "target": { "x": -1199, "z": 953 },
+    "answer": "Vending Machine Place"
+  },
+  {
+    "id": "level-0-019",
+    "question": "Where is the Dark Bridge",
+    "target": { "x": 890, "z": -2090 },
+    "answer": "Dark Bridge"
+  },
+  {
+    "id": "level-0-020",
+    "question": "Where is the Massive Dark Pillar Room",
+    "target": { "x": -1044, "z": -2678 },
+    "answer": "Massive Dark Pillar Room"
+  },
+  {
+    "id": "level-0-021",
+    "question": "Where is W-M.E.G Outpost #2",
+    "target": { "x": 7666, "z": -1837 },
+    "answer": "W-M.E.G Outpost #2"
+  },
+  {
+    "id": "level-0-022",
+    "question": "Where is Glacier",
+    "target": { "x": -1760, "z": -140 },
+    "answer": "Glacier"
+  },
+  {
+    "id": "level-0-023",
+    "question": "Where is the Angel Room",
+    "target": { "x": 223, "z": -2153 },
+    "answer": "Angel Room"
+  },
+  {
+    "id": "level-0-024",
+    "question": "Where is the Level-37 \"Poolrooms\" Entrance",
+    "target": { "x": -2845, "z": -194 },
+    "answer": "Level-37 \"Poolrooms\" Entrance"
+  },
+  {
+    "id": "level-0-025",
+    "question": "Where is the Hub Door",
+    "target": { "x": 4873, "z": 5488 },
+    "answer": "Hub Door"
+  },
+  {
+    "id":"level-0-026",
+    "question":"Where is the Level-0.5 Entrance",
+    "target": {"x": -4900, "z": -1250},
+    "answer":"Level-0.5 Entrance"
+  },
+  {
+    "id":"level-0-027",
+    "question":"Where is the Negative Highroom",
+    "target": {"x": -3983, "z": -2153},
+    "answer":"Negative Highroom"
+  },
+    {
+    "id":"level-0-028",
+    "question":"Where is the Positive Highroom",
+    "target": {"x": 3792, "z": 2207},
+    "answer":"Positive Highroom"
+  },
+  {
+    "id":"level-0-029",
+    "question":"Where is the Level-4 Entrance",
+    "target": {"x": -1800, "z": -500},
+    "answer":"Level-4 Entrance"
+  },
+  {
+    "id":"level-0-030",
+    "question":"Where is the Infinitelands Level-4 Entrance",
+    "target": {"x": -7000, "z": -500},
+    "answer":"Infinitelands Level-4 Entrance"
+  },
+  {
+    "id":"level-0-031",
+    "question":"Where is the Parking Gate",
+    "target": {"x": -2700, "z": 4300},
+    "answer":"Parking Gate"
+  }
+]

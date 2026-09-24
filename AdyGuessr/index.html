@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="AdyGuessr game modes.">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://amqzikqtsvtbqluibkzo.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self';">
+	<title>AdyGuessr</title>
+	<link rel="icon" type="image/png" href="icon.png">
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<main class="app-shell">
+		<header class="topbar">
+			<div class="brand">
+				<img src="icon.png" alt="" class="brand-logo">
+				<a class="brand-name" href="./">AdyGuessr</a>
+			</div>
+			<div class="round-status" id="round-status" aria-live="polite" hidden>
+				<span class="status-dot"></span>
+				<span id="round-label">Round 1 of 5</span>
+			</div>
+			<div class="score-panel" id="score-panel" hidden>
+				<span class="score-label">Current score</span>
+				<strong id="score">0</strong>
+				<span class="score-unit">pts</span>
+			</div>
+		</header>
+		<section class="mode-screen" id="mode-screen" aria-labelledby="mode-title">
+			<p class="eyebrow">Game setup</p>
+			<h1 id="mode-title">Choose a mode</h1>
+			<div class="mode-list" role="group" aria-label="Game modes">
+				<a class="mode-option mode-option--disabled" aria-disabled="true" tabindex="-1">
+					<strong>Entities</strong>
+					<span>Guess which entity is shown by name.</span>
+					<span>20 Questions.</span>
+				</a>
+				<a class="mode-option" href="classic.html?mode=locations">
+					<strong>Locations</strong>
+					<span>Guess where the picture was taken.</span>
+					<span>20 Questions.</span>
+				</a>
+				<a class="mode-option" href="level-0.html">
+					<strong>Level-0 Locations</strong>
+					<span>Find locations by placing guesses on the map, just like GeoGuessr!</span>
+					<span>20 Questions.</span>
+				</a>
+				<a class="mode-option mode-option--disabled" aria-disabled="true" tabindex="-1">
+					<strong>Guessr All</strong>
+					<span>Mix all question types at random on the basic</span>
+					<span>30 Questions.</span>
+				</a>
+			</div>
+			<section class="leaderboard-panel" aria-labelledby="leaderboard-title">
+				<div class="leaderboard-heading">
+					<div>
+						<p class="eyebrow"><span id="leaderboard-mode">Locations</span></p>
+						<h2 id="leaderboard-title">Leaderboard</h2>
+					</div>
+				</div>
+					<div class="leaderboard-header" aria-hidden="true"><span>Place</span><span>Username</span><span>Score</span></div>
+				<div class="leaderboard-list" id="leaderboard-list">
+					<div class="leaderboard-row leaderboard-row--highlight"><span>01</span><strong>You</strong><b>--</b></div>
+					<div class="leaderboard-row"><span>02</span><strong>Coming soon</strong><b>--</b></div>
+					<div class="leaderboard-row"><span>03</span><strong>Coming soon</strong><b>--</b></div>
+				</div>
+			</section>
+			<div class="community-note">
+				<p>Created by <strong>AnthonyL1475 / OfficialWalmartBag</strong></p>
+				<p>This is a fanmade GeoGuessr-type game for AdySYNC | The Backrooms.</p>
+				<p>These are not all the same question types. Some will be mixed up to see if you know them or not. Just try your best; it's a game!</p>
+				<p>The M.E.G. database doesn't help too much, but still don't cheat!</p>
+				<p>If you have any suggestions, ping me in the Community Creations post or just DM me!</p>
+				<p><a href="https://docs.google.com/forms/d/1iMem47M284BShLbaCxUCK3ZMwF3XnASm1JAMmAhVJys/edit" target="_blank" rel="noopener noreferrer">View original game</a></p>
+			</div>
+		</section>
+
+	</main>
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+	<script src="supabase-client.js"></script>
+	<script src="menu.js"></script>
+</body>
+</html>

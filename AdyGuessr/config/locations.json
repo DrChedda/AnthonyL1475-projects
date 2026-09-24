@@ -1,0 +1,121 @@
+[
+    {
+    "id": "location-001",
+    "question": "Where was this little outpost made at?",
+      "image": "images/locations/question-01.png",
+      "answers": ["Infinitelands Staircase", "Level-0.35", "A Removed landmark", "A Random place in Level-0"],
+      "correctAnswer": "Infinitelands Staircase"
+    },
+    {
+      "id": "location-002",
+      "question": "What location in level-0 is this located?",
+      "image": "images/locations/question-02.png",
+      "answers": ["Parking Garage", "Oldgen region", "Vending Machine Place", "Outside one of the Train Stations", "Mold Bastion"],
+      "correctAnswer": "Oldgen region"
+    },
+    {
+      "id": "location-003",
+      "question": "What Level-0 Landmark is this?",
+      "image": "images/locations/question-03.png",
+      "answers": ["Point 7890", "Old Deadzone", "The Backrooms", "Commandants Fortress", "Oldgen Region", "Abandoned Camp"],
+      "correctAnswer": "Commandants Fortress"
+    },
+    {
+      "id": "location-004",
+      "question": "What mold structure is this?",
+      "image": "images/locations/question-04.png",
+      "answers": ["Mold Bastion", "Mold Factory", "Structure made for revealing of the Tripod evolution", "Lions Den", "Level-0.5 Entrance (Bulwark Nest)", "Mold Mouth"],
+      "correctAnswer": "Mold Factory"
+    },
+    {
+      "id": "location-005",
+      "question": "Where is this?",
+      "image": "images/locations/question-05.png",
+      "answers": ["Level-4", "This isn't in the game", "Level-0", "Dream Mall", "Level-124", "Level-1"],
+      "correctAnswer": "Level-1"
+    },
+    {
+      "id": "location-006",
+      "question": "Where is this?",
+      "image": "images/locations/question-06.png",
+      "answers": ["Station Norland", "Near Beacon", "Random Level-0 generation", "Deadzone", "Viridecent Heights", "Infinitelands Staircase"],
+      "correctAnswer": "Near Beacon"
+    },
+    {
+      "id": "location-007",
+      "question": "What landmark in level-0 is this?",
+      "image": "images/locations/question-07.png",
+      "answers": ["Lions Den", "Viridescent Heights", "Deadzone", "Angel Room", "The Commandants Fortress", "Circular Tunnel"],
+      "correctAnswer": "Deadzone"
+    },
+    {
+      "id": "location-008",
+      "question": "Where was this picture taken?",
+      "image": "images/locations/question-08.png",
+      "answers": ["Level-6.3", "Random Mercy Servent build", "Level-94", "Mercy's Garden", "Level-588 (Obsession)"],
+      "correctAnswer": "Mercy's Garden"
+    },
+    {
+      "id": "location-009",
+      "question": "Where did this exist at?",
+      "image": "images/locations/question-09.png",
+      "answers": ["Oldgen Place", "Inifnitelands EAG Base", "Beacon", "Old EAG Base", "Abandoned Outpost"],
+      "correctAnswer": "Beacon"
+    },
+    {
+      "id": "location-010",
+      "question": "What Level is this in?",
+      "image": "images/locations/question-10.png",
+      "answers": ["Dream mall", "Level-558", "Level-124", "Level-37", "Hub", "Level-588"],
+      "correctAnswer": "Level-588"
+    },
+    {
+      "id": "location-011",
+      "question": "Where is this door located?",
+      "image": "images/locations/question-11.png",
+      "answers": ["Deadzone", "Mold Bastion", "Infinitelands Megastructure", "Commandants Fortress", "Random Generation Hallways"],
+      "correctAnswer": "Infinitelands Megastructure"
+    },
+    {
+      "id": "location-012",
+      "question": "What landmark was this?",
+      "image": "images/locations/question-12.png",
+      "answers": ["Lions Den", "Mold Factory", "Mold Mouth", "Level-0.5 Entrance", "Mold Bastion"],
+      "correctAnswer": "Mold Factory"
+    },
+    {
+      "id": "location-013",
+      "question": "Where was this image of chaotic bird taken?",
+      "image": "images/locations/question-13.png",
+      "answers": ["First City", "POI Built outpost", "New york city", "Commandants Fortress", "The Federation's Base"],
+      "correctAnswer": "Commandants Fortress"
+    },
+    {
+      "id": "location-014",
+      "question": "What level is this?",
+      "image": "images/locations/question-14.png",
+      "answers": ["Level-0.775", "Level-0", "Level-1.5", "Level-0.35", "Level-0.75", "Level-12"],
+      "correctAnswer": "Level-0.35"
+    },
+    {
+      "id": "location-015",
+      "question": "Where was this image taken?",
+      "image": "images/locations/question-15.png",
+      "answers": ["PPR", "Old Snackrooms", "Level-124", "Level-9", "Snackrooms"],
+      "correctAnswer": "Old Snackrooms"
+    },
+    {
+      "id": "location-016",
+      "question": "Where was this image taken?",
+      "image": "images/locations/question-16.png",
+      "answers": ["Level-0.5", "Level-0.35", "Level-0.7", "Level-0", "Level-558"],
+      "correctAnswer": "Level-0.7"
+    },
+    {
+      "id": "location-017",
+      "question": "Where was this image taken?",
+      "image": "images/locations/question-17.png",
+      "answers": ["Level-1.1", "Dream Mall", "Level-124", "Level-94", "Level-1"],
+      "correctAnswer": "Level-1.1"
+    }
+  ]

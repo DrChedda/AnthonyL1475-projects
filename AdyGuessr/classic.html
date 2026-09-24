@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://amqzikqtsvtbqluibkzo.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self';">
+  <title>Classic Locations | AdyGuessr</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand"><img src="icon.png" alt="" class="brand-logo"><a class="brand-name" href="index.html">AdyGuessr</a></div>
+      <div class="round-status" id="round-status" aria-live="polite" hidden><span class="status-dot"></span><span id="round-label">Round 1</span></div>
+      <div class="score-panel" id="score-panel" hidden><span class="score-label">Current score</span><strong id="score">0</strong><span class="score-unit">pts</span></div>
+    </header>
+    <p class="load-warning" id="load-warning" role="status" hidden></p>
+    <section class="game-grid" id="game-grid" aria-label="Classic guessing game">
+      <div class="scene-card"><div class="scene-image" id="scene-image" role="img" aria-label="Current location preview"></div><div class="scene-meta"><span id="scene-number">01</span></div><section class="result-card" id="result-card" hidden aria-live="polite"><div><p class="eyebrow">Question complete</p><h2 id="result-title">Nice work.</h2><p id="result-copy">Your result will appear here.</p></div><button class="secondary-button" id="next-button" type="button">Next location &rarr;</button></section></div>
+      <aside class="guess-card">
+        <a class="back-button" href="index.html">&larr; Back to modes</a>
+        <div class="card-heading"><div><p class="eyebrow" id="mode-label">Classic Locations</p><h2 id="question-title">Where is this?</h2></div></div>
+        <div class="answer-list" id="answer-list" role="group" aria-label="Possible locations"></div>
+        <p class="helper-text" id="helper-text">Choose the region that best matches the scene.</p>
+      </aside>
+    </section>
+    <section class="review-screen" id="review-screen" hidden aria-labelledby="review-title"><p class="eyebrow">Game review</p><h1 id="review-title">Game complete</h1><div class="review-summary"><strong id="review-score">0</strong><span>points</span><span class="review-divider">|</span><strong id="review-correct">0/0</strong><span>correct</span></div><div class="review-list" id="review-list"></div><form class="leaderboard-submit" id="leaderboard-submit"><p class="submission-notice">Use your real Roblox username, the one shown in the main Discord server, or your submission will be removed.</p><label for="player-name">Submit your score</label><div><input id="player-name" name="playerName" maxlength="24" placeholder="Your name" required><button class="secondary-button" type="submit">Submit</button></div></form><div class="review-actions"><a class="secondary-button" id="play-again" href="classic.html?mode=locations">Play again</a><a class="back-button" href="index.html">Back to modes</a></div></section>
+  </main>
+  <div class="image-viewer" id="image-viewer" hidden role="dialog" aria-modal="true" aria-label="Enlarged game image"><button class="image-viewer-close" id="image-viewer-close" type="button" aria-label="Close enlarged image">&times;</button><img id="image-viewer-image" src="" alt="Enlarged question image"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+  <script src="supabase-client.js"></script>
+  <script src="name-filter.js"></script>
+  <script src="classic.js" defer></script>
+</body>
+</html>
