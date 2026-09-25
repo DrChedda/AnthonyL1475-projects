@@ -10,9 +10,11 @@ const leaderboardTitle = document.querySelector("#leaderboard-title");
 const leaderboardList = document.querySelector("#leaderboard-list");
 const leaderboardModeLabel = document.querySelector("#leaderboard-mode");
 const modeOptions = document.querySelectorAll(".mode-option:not(.mode-option--disabled)");
+let leaderboardRequestId = 0;
 
 async function renderLeaderboard(mode) {
   if (!leaderboardTitle || !leaderboardList) return;
+  const requestId = ++leaderboardRequestId;
   if (!mode) {
     leaderboardModeLabel.textContent = "Select a mode";
     leaderboardList.innerHTML = "<div class=\"leaderboard-row\"><span>--</span><strong>Choose a mode to view scores</strong><b>--</b></div>";
@@ -35,6 +37,7 @@ async function renderLeaderboard(mode) {
       body: { action: "leaderboard-context", mode }
     })
   ]);
+  if (requestId !== leaderboardRequestId) return;
   if (error) {
     leaderboardList.innerHTML = "<div class=\"leaderboard-row\"><span>--</span><strong>Leaderboard unavailable</strong><b>--</b></div>";
     return;
@@ -70,7 +73,7 @@ function escapeHtml(value) {
 }
 
 modeOptions.forEach((option) => {
-  const optionMode = option.href.includes("mode=entities") ? "entities" : option.href.includes("level-0") ? "level-0" : "locations";
+  const optionMode = option.dataset.mode || (option.href.includes("level-0") ? "level-0" : "locations");
   option.classList.toggle("selected", optionMode === leaderboardMode);
   option.addEventListener("click", (event) => {
     const alreadySelected = option.classList.contains("selected");

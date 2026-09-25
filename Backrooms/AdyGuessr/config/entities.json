@@ -1,9 +1,72 @@
 [
   {
     "id": "entity-001",
-    "question": "STOP LOOKING AROUND YOU BUM",
-    "image": "images/entities/the-watcher.jpg",
-    "answers": ["PEAKING AROUND", "STOP"],
-    "correctAnswer": "STOP"
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-1.png",
+    "answers": ["Dream Mall Worker", "Void Angel", "Void Worker", "The Observer", "Droids"],
+    "correctAnswer": "Void Worker"
+  },
+  {
+    "id": "entity-002",
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-2.png",
+    "answers": ["Pearleye", "Party Duck", "Melody", "Elder Dog", "Strider"],
+    "correctAnswer": "Melody"
+  },
+  {
+    "id": "entity-003",
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-3.png",
+    "answers": ["Pearleye", "Party Duck", "Melody", "Elder Dog", "Strider"],
+    "correctAnswer": "Pearleye"
+  },
+  {
+    "id": "entity-004",
+    "question": "What is the name of this  entity?",
+    "image": "images/entities/question-4.png",
+    "answers": ["Brute Mush", "Partygoer", "Echo", "Moldgoer", "Strider"],
+    "correctAnswer": "Moldgoer"
+  },
+  {
+    "id": "entity-005",
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-5.png",
+    "answers": ["M-State Spotlight", "The Vizer", "Mold Titan", "Vending Mimic", "Infected Vending Machine"],
+    "correctAnswer": "Vending Mimic"
+  },
+  {
+    "id": "entity-006",
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-6.png",
+    "answers": ["The Assistant", "The Vizer", "The Detective", "Striker Smiler", "Umbrella Man", "Observer"],
+    "correctAnswer": "Umbrella Man"
+  },
+  {
+    "id": "entity-007",
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-7.png",
+    "answers": ["Nemisyne", "Mercy", "Memorist", "Wisp"],
+    "correctAnswer": "Wisp"
+  },
+  {
+    "id": "entity-008",
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-8.png",
+    "answers": ["Argos", "Striker Smiler", "Grabber Smiler", "Roaring Darkness", "Meatball Smiler"],
+    "correctAnswer": "Striker Smiler"
+  },
+  {
+    "id": "entity-009",
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-9.png",
+    "answers": ["Statue", "Brute Wretch", "Stoneskin Wretch", "Skeleton", "The Baron"],
+    "correctAnswer": "Statue"
+  },
+  {
+    "id": "entity-010",
+    "question": "What is the name of this entity?",
+    "image": "images/entities/question-10.png",
+    "answers": ["Skeletal Mold", "Rodent", "Striker Smiler", "Neighborhood Watch", "Observer", "Wheatwraith"],
+    "correctAnswer": "Neighborhood Watch"
   }
 ]

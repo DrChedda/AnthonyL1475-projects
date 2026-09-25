@@ -1,0 +1,135 @@
+{
+  "questions": {
+    "entity-001": {
+      "answers": [
+        "Dream Mall Worker",
+        "Void Angel",
+        "Void Worker",
+        "The Observer",
+        "Droids"
+      ],
+      "correct_answer": "Void Worker",
+      "id": "entity-001",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    },
+    "entity-002": {
+      "answers": [
+        "Pearleye",
+        "Party Duck",
+        "Melody",
+        "Elder Dog",
+        "Strider"
+      ],
+      "correct_answer": "Melody",
+      "id": "entity-002",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    },
+    "entity-003": {
+      "answers": [
+        "Pearleye",
+        "Party Duck",
+        "Melody",
+        "Elder Dog",
+        "Strider"
+      ],
+      "correct_answer": "Pearleye",
+      "id": "entity-003",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    },
+    "entity-004": {
+      "answers": [
+        "Brute Mush",
+        "Partygoer",
+        "Echo",
+        "Moldgoer",
+        "Strider"
+      ],
+      "correct_answer": "Moldgoer",
+      "id": "entity-004",
+      "mode": "entities",
+      "question": "What is the name of this  entity?"
+    },
+    "entity-005": {
+      "answers": [
+        "M-State Spotlight",
+        "The Vizer",
+        "Mold Titan",
+        "Vending Mimic",
+        "Infected Vending Machine"
+      ],
+      "correct_answer": "Vending Mimic",
+      "id": "entity-005",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    },
+    "entity-006": {
+      "answers": [
+        "The Assistant",
+        "The Vizer",
+        "The Detective",
+        "Striker Smiler",
+        "Umbrella Man",
+        "Observer"
+      ],
+      "correct_answer": "Umbrella Man",
+      "id": "entity-006",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    },
+    "entity-007": {
+      "answers": [
+        "Nemisyne",
+        "Mercy",
+        "Memorist",
+        "Wisp"
+      ],
+      "correct_answer": "Wisp",
+      "id": "entity-007",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    },
+    "entity-008": {
+      "answers": [
+        "Argos",
+        "Striker Smiler",
+        "Grabber Smiler",
+        "Roaring Darkness",
+        "Meatball Smiler"
+      ],
+      "correct_answer": "Striker Smiler",
+      "id": "entity-008",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    },
+    "entity-009": {
+      "answers": [
+        "Statue",
+        "Brute Wretch",
+        "Stoneskin Wretch",
+        "Skeleton",
+        "The Baron"
+      ],
+      "correct_answer": "Statue",
+      "id": "entity-009",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    },
+    "entity-010": {
+      "answers": [
+        "Skeletal Mold",
+        "Rodent",
+        "Striker Smiler",
+        "Neighborhood Watch",
+        "Observer",
+        "Wheatwraith"
+      ],
+      "correct_answer": "Neighborhood Watch",
+      "id": "entity-010",
+      "mode": "entities",
+      "question": "What is the name of this entity?"
+    }
+  }
+}

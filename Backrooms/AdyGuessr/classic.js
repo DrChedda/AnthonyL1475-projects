@@ -11,13 +11,13 @@ const elements = {
   reviewScore: document.querySelector("#review-score"), reviewCorrect: document.querySelector("#review-correct"), reviewList: document.querySelector("#review-list"),
   leaderboardSubmit: document.querySelector("#leaderboard-submit"), playerName: document.querySelector("#player-name"),
   viewer: document.querySelector("#image-viewer"), viewerImage: document.querySelector("#image-viewer-image"), viewerClose: document.querySelector("#image-viewer-close"),
-  modeLabel: document.querySelector("#mode-label"), helperText: document.querySelector("#helper-text"), playAgain: document.querySelector("#play-again")
+  modeLabel: document.querySelector("#mode-label"), playAgain: document.querySelector("#play-again")
 };
 
 if (isEntityMode) {
+  document.title = "Classic Entities | AdyGuessr";
   elements.modeLabel.textContent = "Classic Entities";
   elements.questionTitle.textContent = "Which entity is this?";
-  elements.helperText.textContent = "Choose the entity that best matches the scene.";
   elements.playAgain.href = "classic.html?mode=entities";
 }
 
