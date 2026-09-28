@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070812">
+    <title>Titled RNG Game</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="scripts/secretAnimation.js" type="module"></script>
+</head>
+<body>
+    <main class="game-shell">
+        <section class="hero-card">
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <span>Coins</span>
+                    <strong id="coinsDisplay">0</strong>
+                </article>
+                <article class="stat-card">
+                    <span>Luck</span>
+                    <strong id="luckDisplay">1.00x</strong>
+                </article>
+                <article class="stat-card">
+                    <span>Rolls</span>
+                    <strong id="rollsDisplay">0</strong>
+                </article>
+                <article class="stat-card">
+                    <span>Best Pull</span>
+                    <strong id="bestDisplay">None</strong>
+                </article>
+                <article class="stat-card">
+                    <span>Rebirths</span>
+                    <strong id="rebirthsDisplay">0</strong>
+                </article>
+            </div>
+
+            <div class="roll-panel" id="rollPanel">
+                <p class="roll-label">Current Aura</p>
+                <h2 id="currentTitle">Click roll to begin</h2>
+                <p id="currentRarity">No title equipped</p>
+                <p id="currentOdds">Odds: -</p>
+                <div id="auraBoosts" class="aura-boosts"></div>
+            </div>
+
+            <div class="actions">
+                <button id="rollButton" class="primary-button" type="button">Roll <kbd class="key-hint">Space</kbd></button>
+                <button id="autoRollButton" class="secondary-button" type="button">Auto Roll: Off</button>
+                <button id="sellDuplicatesButton" class="secondary-button" type="button">Sell Duplicates</button>
+            </div>
+        </section>
+
+        <aside class="side-panel">
+            <section class="tabs-card">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="inventory" type="button">Inventory</button>
+                    <button class="tab-button" data-tab="shop" type="button">Shop</button>
+                    <button class="tab-button" data-tab="settings" type="button">Settings</button>
+                </div>
+
+                <div class="tab-panel active" id="inventoryTab">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Collection</p>
+                            <h2>Inventory</h2>
+                        </div>
+                        <span id="inventoryCount">0 owned</span>
+                    </div>
+                    <div id="inventoryList" class="inventory-list">
+                        <p id="inventoryEmptyState" class="empty-state">No titles yet. The grind awaits.</p>
+                    </div>
+                </div>
+
+                <div class="tab-panel" id="shopTab">
+                    <div class="shop-stack" id="shopAvailable">
+                        <article class="upgrade-card">
+                            <div>
+                                <p class="eyebrow">Upgrade</p>
+                                <h2>Luck Boost</h2>
+                                <p>Improves your chance to hit rarer titles.</p>
+                                <div class="luck-progress-wrap">
+                                    <div class="luck-progress-bar" id="luckProgressBar"></div>
+                                </div>
+                                <small data-upgrade-label="luck1" class="meta-line"></small>
+                            </div>
+                            <button data-upgrade-btn="luck1" class="shop-button" type="button">Buy Luck</button>
+                        </article>
+
+                        <article class="upgrade-card">
+                            <div>
+                                <p class="eyebrow">Upgrade</p>
+                                <h2>Luck Boost 2</h2>
+                                <p>Doubles the effectiveness of Luck Boost 1.</p>
+                                <div class="luck-progress-wrap">
+                                    <div class="luck-progress-bar" id="luckProgressBar2"></div>
+                                </div>
+                                <small data-upgrade-label="luck2" class="meta-line"></small>
+                            </div>
+                            <button data-upgrade-btn="luck2" class="shop-button" type="button">Buy Luck 2</button>
+                        </article>
+
+                        <article class="upgrade-card">
+                            <div>
+                                <p class="eyebrow">Upgrade</p>
+                                <h2>Auto Roll</h2>
+                                <p>Unlocks hands-free rolling from the main controls. Permanent upgrade.</p>
+                            </div>
+                            <button id="unlockAutoRollButton" class="shop-button" type="button">Unlock Auto Roll</button>
+                        </article>
+
+                        <article class="upgrade-card">
+                            <div>
+                                <p class="eyebrow">Prestige</p>
+                                <h2>Rebirth</h2>
+                                <p>Reset progress for a permanent coin and luck multiplier.</p>
+                                <small id="rebirthBonusDisplay" class="meta-line"></small>
+                            </div>
+                            <button id="rebirthButton" class="shop-button shop-button-danger" type="button">Rebirth</button>
+                        </article>
+                    </div>
+
+                    <div id="shopCompleted" class="shop-completed" hidden>
+                        <div class="panel-heading compact">
+                            <div>
+                                <p class="eyebrow">Completed</p>
+                                <h2>Mastered Upgrades</h2>
+                            </div>
+                        </div>
+                        <div class="shop-stack shop-stack-compact">
+                            <article class="upgrade-card mastered-card" id="masteredLuckCard" hidden>
+                                <div>
+                                    <p class="eyebrow">Mastered</p>
+                                    <h2>Luck Boost</h2>
+                                    <p>Fully upgraded to the maximum level.</p>
+                                </div>
+                                <div class="max-badge">Max Level Reached</div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-panel" id="settingsTab">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Preferences</p>
+                            <h2>Settings</h2>
+                        </div>
+                    </div>
+
+                    <div class="settings-stack">
+                        <article class="settings-card">
+                            <h3>Autosave</h3>
+                            <p>Progress saves every 45 seconds and when you leave the page.</p>
+                        </article>
+                        <article class="settings-card">
+                            <h3>TestSecretAnimationBtn</h3>
+                            <button onclick="SecretAnimation.trigger('Test Tile that doesnt exist')">Click Me</button>
+                        </article>
+                    </div>
+
+                    <div class="settings-log-section">
+                        <div class="panel-heading compact">
+                            <div>
+                                <p class="eyebrow">Recent Pulls</p>
+                                <h2>Roll History</h2>
+                            </div>
+                        </div>
+                        <ol id="rollLog" class="roll-log">
+                            <li id="rollLogEmptyState" class="empty-state">No rolls yet.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <template id="boostPillTemplate">
+        <span class="boost-pill"></span>
+    </template>
+
+    <template id="inventoryItemTemplate">
+        <article class="inventory-item" data-equip-title="">
+            <strong class="inventory-item-title"></strong>
+            <strong class="inventory-item-count"></strong>
+            <span class="inventory-item-rarity"></span>
+            <small class="inventory-item-meta"></small>
+            <button class="equip-button" type="button"></button>
+            <button class="sell-button" type="button"></button>
+        </article>
+    </template>
+
+    <template id="rollLogItemTemplate">
+        <li>
+            <strong class="roll-log-name"></strong>
+            <span class="roll-log-rarity"></span>
+        </li>
+    </template>
+
+    <div id="secretOverlay" class="secret-overlay hidden">
+        <canvas id="secretCanvas"></canvas>
+        <div class="secret-content">
+            <div class="secret-subtitle">✦ SECRET TITLE FOUND ✦</div>
+            <div id="secretTitleText" class="secret-title-text">THE VOID</div>
+        </div>
+    </div>
+
+    <script type="module" src="scripts/game.js"></script>
+</body>
+</html>

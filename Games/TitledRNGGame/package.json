@@ -1,0 +1,7 @@
+{
+  "name": "titled-rng-game",
+  "private": true,
+  "scripts": {
+    "start": "python -m http.server 8000"
+  }
+}

@@ -1,0 +1,48 @@
+/* The button grid */
+.button-grid {
+    display: grid;
+    grid-template-rows: repeat(5, 75px); /* 5 rows, each 75px high */
+    grid-template-columns: repeat(9, 150px); /* 9 columns, each 150px wide */
+    gap: 50px; /* Gap between buttons */
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
+    position: relative; /* Set as relative to position the connecting bar behind */
+}
+
+/* Style for buttons */
+.treebutton {
+    display: block;
+    background-color: rgb(57, 68, 71);
+    border: 2px solid rgb(116, 116, 116);
+    padding: 10px;
+    border-radius: 5%;
+    cursor: pointer;
+    user-select: none;
+    color: white;
+    text-align: center;
+    width: 100%; /* Make buttons stretch within grid cells */
+    height: 100%; /* Make buttons stretch within grid cells */
+}
+
+/* Disabled button styling */
+.treebutton:disabled {
+    background-color: rgb(30, 40, 42); /* Darker color when disabled */
+    cursor: default;
+}
+
+span {
+    margin: 0;
+    padding: 0;
+    line-height: 0.1;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: rgb(31, 31, 31);
+    color: white;
+}

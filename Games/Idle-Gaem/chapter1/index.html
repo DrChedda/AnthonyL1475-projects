@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Idle Gaem</title>
+  
+  <link id="theme-stylesheet" rel="stylesheet" href="theme.dark.css">
+  <script>
+
+  </script>
+</head>
+<body>
+  <header>
+    <div id="material-display" aria-live="polite">Materials: 0</div>
+    <div id="materials-per-second-display" style="display:none">Materials/s: 0</div>
+    <nav style="margin-left:auto">
+      <a href="../guide.html" target="_blank">Guide</a>
+    </nav>
+    <style>
+      body {
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        -moz-user-select: none;
+        user-select: none
+      }
+    </style>
+  </header>
+
+  
+  <nav class="top-menu">
+    <button data-tab="game">Gaem</button>
+    <button data-tab="research">Research</button>
+    <button data-tab="inventory">Inventory</button>
+    <button data-tab="achievements">Achievements</button>
+    <button data-tab="options">Options</button>
+  </nav>
+
+  
+  <div id="chapterMessage">Chapter 1</div>
+  <div id="chapter1Message">GAMBLING!!</div>
+
+  
+  <div id="tab-game" class="tab-page">
+    <div id="game-container">
+      <button id="collect-btn">Collect</button>
+      <br />
+      <button id="crate-btn">Open Basic Crate</button>
+      <button id="advanced-crate-btn">Open Advanced Crate</button>
+      <button id="epic-crate-btn">Open Epic Crate</button>
+    </div>
+  </div>
+
+  <div id="version-badge">
+    <a>V0.1.3a</a>
+  </div>
+
+  <div id="tab-research" class="tab-page" style="display:none;">
+    <h2>Research</h2>
+    <div id="research-area" style="max-height: calc(100vh - 220px); overflow-y: auto; overflow-x: hidden; padding-bottom: 20px;">
+      <p class="research-intro">Research allows you to unlock upgrades and mechanics for Chapter 1. Spend research points to unlock nodes.</p>
+      <div id="research-header" style="display:flex;gap:12px;align-items:center;justify-content:center;margin-bottom:8px;">
+        <div id="research-points">Research Points: 0</div>
+      </div>
+      <div id="research-list">Error</div>
+    </div>
+  </div>
+
+  <div id="tab-inventory" class="tab-page" style="display:none;">
+    <h2>Your Inventory</h2>
+    <div id="pickaxe-list">No items yet.</div>
+  </div>
+
+  <div id="tab-achievements" class="tab-page" style="display:none;">
+    <h2>Achievements</h2>
+    <div id="achievements-list"></div>
+  </div>
+
+  
+  <div id="tab-options" class="tab-page" style="display:none;">
+    <h2>Options</h2>
+    <button id="reset-btn" class="danger-btn">Reset Save</button>
+    <button id="save-btn">Save</button>
+    
+    <div style="margin-top:20px;">
+      <label id="theme-label" for="theme-toggle">Light Mode</label>
+      <input type="checkbox" id="theme-toggle">
+    </div>
+
+    <div style="margin-top:12px;">
+      <label id="format-label" for="format-toggle">Use Number Formatting</label>
+      <input type="checkbox" id="format-toggle">
+    </div>
+  </div>
+
+  
+  <div id="confirm-bar" class="confirm-bar" hidden>
+    <span>Are you sure you want to reset your save?</span>
+    <div class="confirm-actions">
+      <button id="confirm-yes-chapter">Chapter Reset</button>
+      <button id="confirm-yes-full">Full Reset</button>
+      <button id="confirm-no">No</button>
+    </div>
+  </div>
+
+  <div id="feedback" class="feedback"></div>
+
+  
+  <script src="js/common.js"></script>
+  <script src="js/rebirth-one.js"></script>
+  <script src="js/research.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/animations.js"></script>
+  
+  <script src="js/ui.js"></script>
+  <script src="js/debugger.js"></script>
+  <script>
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        if (document.activeElement.tagName === 'BUTTON') {
+          e.preventDefault();
+          document.activeElement.blur();
+        }
+      }
+    });
+
+  (async function () {
+      const FILES = [
+          "js/common.js",
+          "js/rebirth-one.js",
+          "js/research.js",
+          "js/achievements.js",
+          "js/animations.js",
+          "js/ui.js",
+          "js/debugger.js"
+      ];
+
+      function hashString(str) {
+          let hash = 0;
+          for (let i = 0; i < str.length; i++) {
+              hash = ((hash << 5) - hash) + str.charCodeAt(i);
+              hash |= 0;
+          }
+          return Math.abs(hash).toString(16);
+      }
+
+      function normalize(text) {
+          text = text.replace(/^\uFEFF/, "");
+          text = text.replace(/\r\n/g, "\n");
+          text = text.replace(/\n+$/g, "");
+          return text;
+      }
+
+      let combined = "";
+
+      for (const file of FILES) {
+          const res = await fetch(file, { cache: "no-store" });
+          const text = await res.text();
+          const normalized = normalize(text);
+          const commentPath = file.replace(/^(\.\.\/)+/, "");
+          combined += `/* ${commentPath} */\n${normalized}\n`;
+      }
+
+      window.CURRENT_BUILD_ID = "build-" + hashString(combined);
+  })();
+
+  </script>
+</body>
+</html>
