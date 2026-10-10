@@ -110,8 +110,9 @@
         if (walls) walls.classList.toggle('hidden', visStuds > 2e7);
 
         let majorStep, minorStep;
-        if (visStuds >= 5e5 && visStuds <= 2e7) {
-            majorStep = 1e6; minorStep = 2e5;
+        const sectorGrid = visStuds >= 5e5 && visStuds <= 2e7;
+        if (sectorGrid) {
+            majorStep = 2e6; minorStep = 2e6;
         } else {
             const steps = getSteps(120 * studsPerPixel);
             majorStep = steps.majorStep;
@@ -130,7 +131,8 @@
 
         if ((endIdxZ - startIdxZ) > 500 || bH <= 0 || bW <= 0) return;
 
-        const isMajorIndex = i => ((i - 2) % 5 + 5) % 5 === 0;
+        const isMajorIndex = i => sectorGrid || ((i - 2) % 5 + 5) % 5 === 0;
+        const gridOffset = 0.5;
 
         // Single pass per axis: bucket each line into a minor/major Path2D
         // instead of re-scanning the whole index range twice (once per pass,
@@ -140,7 +142,7 @@
         const majorPath = new Path2D();
 
         for (let i = startIdxZ; i <= endIdxZ; i++) {
-            const z = (i + 0.5) * minorStep;
+            const z = (i + gridOffset) * minorStep;
             if (Math.abs(z) > LIMIT) continue;
 
             const sX = toScreenX(z);
@@ -152,7 +154,7 @@
         }
 
         for (let i = startIdxX; i <= endIdxX; i++) {
-            const x = (i + 0.5) * minorStep;
+            const x = (i + gridOffset) * minorStep;
             if (Math.abs(x) > LIMIT) continue;
 
             const sY = toScreenY(x);

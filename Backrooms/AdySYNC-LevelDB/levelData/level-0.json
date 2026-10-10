@@ -164,6 +164,111 @@
             "name": "Western Inlands Entrance",
             "color": "blue",
             "layer": 0
+        },
+        {
+            "x": 4890,
+            "z": -1679,
+            "name": "Glitch House",
+            "color": "purple",
+            "layer": 0
+        },
+        {
+            "x": 2160,
+            "z": 2430,
+            "name": "Cinema",
+            "color": "blue",
+            "layer": 0
+        },
+        {
+            "x": 4090,
+            "z": -4500,
+            "name": "Mold Bastion",
+            "color": "green",
+            "layer": 0
+        },
+        {
+            "x": 2050,
+            "z": -1050,
+            "name": "Lions Den",
+            "color": "green",
+            "layer": 0
+        },
+        {
+            "x": 1882,
+            "z": -2210,
+            "name": "PPR",
+            "color": "gray",
+            "layer": 0
+        },
+        {
+            "x": 900,
+            "z": 1300,
+            "name": "Meg Stairs",
+            "color": "orange",
+            "layer": 0
+        },
+        {
+            "x": -5190,
+            "z": -1850,
+            "name": "Deadzone",
+            "color": "black",
+            "layer": 0
+        },
+        {
+            "x": -2250,
+            "z": -500,
+            "name": "FOMA Base",
+            "color": "lightcoral",
+            "layer": 0
+        },
+        {
+            "x": 1800,
+            "z": -5150,
+            "name": "Unknown Outpost",
+            "color": "black",
+            "layer": 0
+        },
+        {
+            "x": 120,
+            "z": -2900,
+            "name": "Pitfalls (DSW Base)",
+            "color": "black",
+            "layer": 0
+        },
+        {
+            "x": 1200,
+            "z": 4600,
+            "name": "0.35 Entrance",
+            "color": "green",
+            "layer": 0
+        },
+        {
+            "x": 1550,
+            "z": 1800,
+            "name": "Large Pillar Room",
+            "color": "yellow",
+            "layer": 0
+        },
+        {
+            "x": -1700,
+            "z": -1700,
+            "name": "Glacier",
+            "color": "lightskyblue",
+            "layer": 0
+        },
+        {
+            "x": -1075,
+            "z": 3160,
+            "name": "Vending Machine Place",
+            "color": "white",
+            "layer": 0
+        },
+        {
+            "x": null,
+            "z": null,
+            "name": "Sinkhole",
+            "color": "lightgreen",
+            "layer": 0
         }
     ]
 }

@@ -25,7 +25,7 @@
 
         function isVisible(id, visStuds) {
             const layer = layers.get(id) ?? layers.get('default');
-            if (!layer) return true; // unknown id, no default defined -> fail open
+            if (!layer) return true;
             return layer.enabled && visStuds >= layer.minVisStuds && visStuds <= layer.maxVisStuds;
         }
 
@@ -48,9 +48,6 @@
         return { define, isVisible, setEnabled, toggle, has, list };
     })();
 
-    // Default layers — these reproduce your old behavior exactly, just
-    // named and centralized instead of scattered across 4 conditionals.
-    // Add/adjust/remove layers here; nothing else in the file needs to change.
     LayerManager
         .define('default',  { maxVisStuds: Infinity })       // always visible unless disabled
         .define('walls',    { maxVisStuds: Infinity })
@@ -61,14 +58,11 @@
         .define('border',   { maxVisStuds: 2e7 })
         .define('grid',     { maxVisStuds: Infinity });
 
-    // Backward-compat shim: old level JSON may still have numeric `layer`
-    // values (0/1/2) on points instead of string ids. Map those onto the
-    // new named layers so existing level data keeps working unchanged.
     const LEGACY_NUMERIC_LAYER = { 0: 'detail', 1: 'regional', 2: 'overview' };
     function resolveLayerId(rawLayer) {
         if (rawLayer == null) return 'default';
         if (typeof rawLayer === 'number') return LEGACY_NUMERIC_LAYER[rawLayer] ?? 'overview';
-        return rawLayer; // already a string id
+        return rawLayer;
     }
 
     const canvas = Object.assign(document.createElement('canvas'), { className: 'walls-canvas' });
@@ -76,7 +70,8 @@
     wallsLayer.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
-    let currentLevelData = null, wallData = [], pointsData = [], sectorNamesData = {}, isRenderPending = false;
+    let currentLevelData = null, wallData = [], pointsData = [], pointElements = [], sectorNamesData = {}, isRenderPending = false;
+    const SECTOR_SIZE = 2e6;
 
     const columnLetterCache = new Map();
     const getColumnLetter = col => {
@@ -105,13 +100,16 @@
     }
 
     function centerLevelData(data) {
-        const items = [...(data.walls || []), ...(data.locations || [])].filter(Boolean);
+        const items = [...(data.walls || []), ...(data.locations || [])]
+            .filter(p => p && p.x != null && p.z != null);
         if (!items.length) return data;
 
         let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
         items.forEach(p => {
-            if (p.x !== undefined) { if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x; }
-            if (p.z !== undefined) { if (p.z < minZ) minZ = p.z; if (p.z > maxZ) maxZ = p.z; }
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.z < minZ) minZ = p.z;
+            if (p.z > maxZ) maxZ = p.z;
         });
 
         if (minX === Infinity) return data;
@@ -119,7 +117,9 @@
 
         ['walls', 'locations'].forEach(key => {
             if (data[key]) {
-                data[key] = data[key].map(p => p ? { ...p, x: Math.round(p.x - offX), z: Math.round(p.z - offZ) } : null);
+                data[key] = data[key].map(p => p && p.x != null && p.z != null
+                    ? { ...p, x: Math.round(p.x - offX), z: Math.round(p.z - offZ) }
+                    : p);
             }
         });
         return data;
@@ -147,8 +147,6 @@
 
         ctx.clearRect(0, 0, w, h);
 
-        // Walls: each point can optionally carry its own `layer`; falls
-        // back to the level-wide default (still 'walls' if unspecified).
         const wallsLevelLayer = currentLevelData?.wallsLayer || 'walls';
         if (wallData?.length > 0 && LayerManager.isVisible(wallsLevelLayer, visStuds)) {
             const wallWidth = 3;
@@ -157,7 +155,7 @@
             ctx.fillStyle = '#4378c9';
 
             const wallVisible = p => {
-                if (!p || p.x === undefined || Math.abs(p.x) > LIMIT || Math.abs(p.z) > LIMIT) return false;
+                if (!p || p.x == null || p.z == null || Math.abs(p.x) > LIMIT || Math.abs(p.z) > LIMIT) return false;
                 return LayerManager.isVisible(resolveLayerId(p.layer ?? wallsLevelLayer), visStuds);
             };
 
@@ -223,32 +221,31 @@
 
             const sectorsLayerId = currentLevelData?.sectorsLayer || 'sectors';
             if (currentLevelData?.hasSectors && LayerManager.isVisible(sectorsLayerId, visStuds)) {
-                const step = 1e6;
-                const referenceSPP = 2000;
-                const scale = Math.max(0.05, Math.min(5.0, referenceSPP * invSpp));
-                const sR = Math.floor((minVisX + 5e5) / step), eR = Math.floor((maxVisX + 5e5) / step);
-                const sC = Math.floor((minVisZ + 5e5) / step), eC = Math.floor((maxVisZ + 5e5) / step);
+                const step = SECTOR_SIZE;
+                const halfStep = step * 0.5;
+                const sR = Math.floor((minVisX + halfStep) / step), eR = Math.floor((maxVisX + halfStep) / step);
+                const sC = Math.floor((minVisZ + halfStep) / step), eC = Math.floor((maxVisZ + halfStep) / step);
 
                 if ((eR - sR) * (eC - sC) < 400) {
                     const frag = document.createDocumentFragment();
                     for (let r = sR; r <= eR; r++) {
                         for (let col = sC; col <= eC; col++) {
-                            const wX = (r * step) - 5e5, wZ = (col * step) + 5e5;
+                            const wX = (r * step) - halfStep;
+                            const wZ = (col * step) + halfStep;
                             if (Math.abs(wX) > LIMIT || Math.abs(wZ) > LIMIT) continue;
 
                             const posX = toX(wZ), posY = toY(wX);
                             if (inView(posX, posY, 100)) {
                                 const secId = `${r}|${getColumnLetter(col)}`;
                                 const lbl = document.createElement('div');
-                                lbl.className = 'sector-title-label';
+                                lbl.className = 'dynamic-axis-label sector-title-label';
                                 lbl.textContent = `Sector ${sectorNamesData[secId] ? sectorNamesData[secId] + ` ${secId}` : secId}`;
 
                                 Object.assign(lbl.style, {
                                     position: 'absolute',
                                     left: `${posX}px`,
                                     top: `${posY}px`,
-                                    transformOrigin: 'top left',
-                                    transform: `scale(${scale}) translate(4px, 4px)`,
+                                    transform: 'translate(4px, 4px)',
                                     pointerEvents: 'none'
                                 });
                                 frag.appendChild(lbl);
@@ -285,39 +282,25 @@
         }
 
         if (pointsLayer) {
-            pointsLayer.textContent = '';
-            if (pointsData?.length) {
-                const frag = document.createDocumentFragment();
-                pointsData.forEach(p => {
-                    if (!p || p.x === undefined || Math.abs(p.x) > LIMIT || Math.abs(p.z) > LIMIT) return;
-                    if (p.x < minVisX || p.x > maxVisX || p.z < minVisZ || p.z > maxVisZ) return;
+            const visibleLabels = [];
+            pointElements.forEach(({ point, layerId, container, label }) => {
+                if (point.x == null || point.z == null ||
+                    Math.abs(point.x) > LIMIT || Math.abs(point.z) > LIMIT ||
+                    point.x < minVisX || point.x > maxVisX ||
+                    point.z < minVisZ || point.z > maxVisZ ||
+                    !LayerManager.isVisible(layerId, visStuds)) {
+                    container.style.display = 'none';
+                    return;
+                }
 
-                    const layerId = resolveLayerId(p.layer);
-                    if (!LayerManager.isVisible(layerId, visStuds)) return;
-
-                    const pX = toX(p.z), pY = toY(p.x);
-
-                    const cont = document.createElement('div');
-                    cont.className = 'map-point-container';
-                    cont._pointData = p;
-                    Object.assign(cont.style, { position: 'absolute', left: `${pX}px`, top: `${pY}px`, cursor: 'pointer', pointerEvents: 'auto' });
-
-                    const marker = document.createElement('div');
-                    marker.className = 'point-marker';
-                    if (p.color) Object.assign(marker.style, { backgroundColor: p.color, boxShadow: `0 0 8px ${p.color}` });
-                    cont.appendChild(marker);
-
-                    if (p.name) {
-                        const lbl = document.createElement('span');
-                        lbl.className = 'point-label';
-                        lbl.textContent = p.name;
-                        cont.appendChild(lbl);
-                    }
-
-                    frag.appendChild(cont);
-                });
-                pointsLayer.appendChild(frag);
-            }
+                const pointX = toX(point.z);
+                const pointY = toY(point.x);
+                container.style.display = '';
+                container.style.left = `${pointX}px`;
+                container.style.top = `${pointY}px`;
+                if (label) visibleLabels.push({ container, label, pointX, pointY });
+            });
+            resolvePointLabelCollisions(visibleLabels);
         }
     }
 
@@ -341,10 +324,135 @@
         labelsLayer.appendChild(lbl);
     }
 
+    function resolvePointLabelCollisions(entries) {
+        entries = entries.map(entry => ({
+            ...entry,
+            width: entry.label.offsetWidth || 64,
+            height: entry.label.offsetHeight || 14
+        }));
+
+        const candidateOffsets = [
+            { x: 0, y: 12 },
+            { x: 0, y: -14 },
+            { x: 12, y: 12 },
+            { x: -12, y: 12 },
+            { x: 12, y: -14 },
+            { x: -12, y: -14 },
+            { x: 0, y: 22 },
+            { x: 0, y: -24 },
+            { x: 20, y: 0 },
+            { x: -20, y: 0 }
+        ];
+
+        const circleIntersectsRect = (cx, cy, radius, left, top, right, bottom) => {
+            const nearestX = Math.max(left, Math.min(cx, right));
+            const nearestY = Math.max(top, Math.min(cy, bottom));
+            const dx = cx - nearestX;
+            const dy = cy - nearestY;
+            return (dx * dx) + (dy * dy) < (radius * radius);
+        };
+
+        const rectsOverlap = (leftA, topA, rightA, bottomA, leftB, topB, rightB, bottomB) =>
+            leftA < rightB && rightA > leftB && topA < bottomB && bottomA > topB;
+
+        entries.forEach(entry => {
+            entry.label._labelOffsetX = 0;
+            entry.label._labelOffsetY = 0;
+        });
+
+        entries.forEach((entry, index) => {
+            let chosen = candidateOffsets[0];
+
+            for (const candidate of candidateOffsets) {
+                const boxLeft = entry.pointX + candidate.x - (entry.width * 0.5);
+                const boxRight = boxLeft + entry.width;
+                const boxTop = entry.pointY + candidate.y;
+                const boxBottom = boxTop + entry.height;
+
+                let collides = false;
+
+                if (circleIntersectsRect(entry.pointX, entry.pointY, 5, boxLeft, boxTop, boxRight, boxBottom)) {
+                    collides = true;
+                }
+
+                for (let i = 0; i < entries.length; i++) {
+                    if (i === index) continue;
+
+                    const other = entries[i];
+                    const otherLeft = other.pointX + (other.label._labelOffsetX ?? 0) - (other.width * 0.5);
+                    const otherRight = otherLeft + other.width;
+                    const otherTop = other.pointY + (other.label._labelOffsetY ?? 0);
+                    const otherBottom = otherTop + other.height;
+
+                    if (rectsOverlap(boxLeft, boxTop, boxRight, boxBottom, otherLeft, otherTop, otherRight, otherBottom) ||
+                        circleIntersectsRect(other.pointX, other.pointY, 5, boxLeft, boxTop, boxRight, boxBottom)) {
+                        collides = true;
+                        break;
+                    }
+                }
+
+                if (!collides) {
+                    chosen = candidate;
+                    break;
+                }
+            }
+
+            entry.label._labelOffsetX = chosen.x;
+            entry.label._labelOffsetY = chosen.y;
+            entry.label.style.left = '0px';
+            entry.label.style.top = '0px';
+            entry.label.style.transform = `translate(${chosen.x - (entry.width * 0.5)}px, ${chosen.y}px)`;
+        });
+    }
+
     function renderActiveViewportContent() {
         if (isRenderPending) return;
         isRenderPending = true;
         requestAnimationFrame(() => { drawViewport(); isRenderPending = false; });
+    }
+
+    function buildPointElements() {
+        if (!pointsLayer) return;
+
+        const fragment = document.createDocumentFragment();
+        pointElements = [];
+
+        pointsData.forEach(point => {
+            if (!point || point.x == null || point.z == null) return;
+
+            const container = document.createElement('div');
+            container.className = 'map-point-container';
+            container._pointData = point;
+            Object.assign(container.style, {
+                position: 'absolute',
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                display: 'none'
+            });
+
+            const marker = document.createElement('div');
+            marker.className = 'point-marker';
+            if (point.color) {
+                Object.assign(marker.style, {
+                    backgroundColor: point.color,
+                    boxShadow: `0 0 8px ${point.color}`
+                });
+            }
+            container.appendChild(marker);
+
+            let label = null;
+            if (point.name) {
+                label = document.createElement('span');
+                label.className = 'point-label';
+                label.textContent = point.name;
+                container.appendChild(label);
+            }
+
+            pointElements.push({ point, layerId: resolveLayerId(point.layer), container, label });
+            fragment.appendChild(container);
+        });
+
+        pointsLayer.replaceChildren(fragment);
     }
 
     function loadLevel(levelNum = 0) {
@@ -355,6 +463,7 @@
                 wallData = currentLevelData.walls || [];
                 pointsData = currentLevelData.locations || [];
                 sectorNamesData = currentLevelData.sectors || {};
+                buildPointElements();
 
                 const levelId = currentLevelData.levelId || `Level-${levelNum}`;
                 if (coordTagEl) coordTagEl.textContent = levelId;
@@ -396,6 +505,7 @@
             .catch(err => {
                 console.warn(err, "Defaulting to empty viewport.");
                 wallData = []; pointsData = []; sectorNamesData = {};
+                buildPointElements();
                 if (coordTagEl) coordTagEl.textContent = `Level-${levelNum}`;
                 window.MapEngine?.applyTransform();
             });
@@ -405,7 +515,7 @@
 
     window.MapOverlay = {
         loadLevel,
-        layers: LayerManager, // e.g. MapOverlay.layers.setEnabled('sectors', false); renderActiveViewportContent();
+        layers: LayerManager,
         refresh: renderActiveViewportContent,
         destroy: () => {
             if (pointsLayer) pointsLayer.removeEventListener('click', handlePointClick);
