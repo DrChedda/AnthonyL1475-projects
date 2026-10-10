@@ -178,7 +178,7 @@
         if (!coordOut) return;
         const r = getRect();
         const { x, z } = toWorld(eX - r.left, eY - r.top, r);
-        coordOut.textContent = `X ${Math.round(x).toLocaleString('en-US')}, Z ${Math.round(z).toLocaleString('en-US')}`;
+        coordOut.textContent = `${Math.round(x).toLocaleString('en-US')} X, ${Math.round(z).toLocaleString('en-US')} Z`;
     }
 
     const handleWheel = (e) => {

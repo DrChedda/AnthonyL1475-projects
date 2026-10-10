@@ -52,12 +52,12 @@
                 Number.isFinite(Number(data.x)) && Number.isFinite(Number(data.z));
             coordinateEl.hidden = !hasCoordinates;
             coordinateEl.textContent = hasCoordinates
-                ? `X ${Number(data.x).toLocaleString('en-US')} · Z ${Number(data.z).toLocaleString('en-US')}`
+                ? `${Number(data.x).toLocaleString('en-US')} X, ${Number(data.z).toLocaleString('en-US')} Z`
                 : '';
+            coordinateEl.title = 'Click to copy coordinates';
         }
 
         if (trelloContainer) {
-            // Safely clear old children
             while (trelloContainer.firstChild) {
                 trelloContainer.removeChild(trelloContainer.firstChild);
             }
@@ -125,9 +125,24 @@
         renderLevelButtons();
     };
 
+    const handleCoordinateClick = async () => {
+        const coordinateEl = sidebar?.querySelector('.sidebar-coordinate-readout');
+        if (!coordinateEl || coordinateEl.hidden) return;
+
+        try {
+            await navigator.clipboard.writeText(coordinateEl.textContent);
+            coordinateEl.title = 'Copied to clipboard';
+        } catch (error) {
+            console.error('Could not copy point coordinates to the clipboard.', error);
+            coordinateEl.title = 'Could not copy coordinates';
+        }
+    };
+
     if (levelGroupContainer) {
         levelGroupContainer.addEventListener('click', handleContainerClick);
     }
+    const coordinateButton = sidebar?.querySelector('.sidebar-coordinate-readout');
+    coordinateButton?.addEventListener('click', handleCoordinateClick);
 
     renderLevelButtons();
 
@@ -137,6 +152,7 @@
             if (levelGroupContainer) {
                 levelGroupContainer.removeEventListener('click', handleContainerClick);
             }
+            coordinateButton?.removeEventListener('click', handleCoordinateClick);
         }
     };
 })();
