@@ -147,7 +147,7 @@
         {
             "x": 1000,
             "z": 3960,
-            "name": "Eastern Inlands Entrance",
+            "name": "Western Inlands Entrance",
             "color": "blue",
             "layer": 0
         },
@@ -161,7 +161,7 @@
         {
             "x": 1140,
             "z": -5040,
-            "name": "Western Inlands Entrance",
+            "name": "Eastern Inlands Entrance",
             "color": "blue",
             "layer": 0
         },

@@ -40,12 +40,21 @@
     function updateSidebar(data) {
         if (!sidebar) return;
 
-        const titleEl = sidebar.querySelector('.sidebar-title');
+        const titleEl = sidebar.querySelector('.sidebar-title-text');
         const descEl = sidebar.querySelector('.sidebar-desc');
         const trelloContainer = sidebar.querySelector('.sidebar-trello-wrapper');
+        const coordinateEl = sidebar.querySelector('.sidebar-coordinate-readout');
 
         if (titleEl) titleEl.textContent = data.name || 'Unknown Location';
         if (descEl) descEl.textContent = data.description || 'No description provided.';
+        if (coordinateEl) {
+            const hasCoordinates = data.x != null && data.z != null &&
+                Number.isFinite(Number(data.x)) && Number.isFinite(Number(data.z));
+            coordinateEl.hidden = !hasCoordinates;
+            coordinateEl.textContent = hasCoordinates
+                ? `X ${Number(data.x).toLocaleString('en-US')} · Z ${Number(data.z).toLocaleString('en-US')}`
+                : '';
+        }
 
         if (trelloContainer) {
             // Safely clear old children
