@@ -269,6 +269,13 @@
             "name": "Sinkhole",
             "color": "lightgreen",
             "layer": 0
+        },
+        {
+            "x": 1800,
+            "z": 0,
+            "name": "Calm",
+            "color": "darkblue",
+            "layer": 0
         }
     ]
 }
