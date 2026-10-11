@@ -337,6 +337,13 @@
             "name": "Project Fakerunner",
             "color": "white",
             "layer": 0
+        },
+        {
+            "x": -2064,
+            "z": -2640,
+            "name": "Artifact Chamber",
+            "color": "purple",
+            "layer": 0
         }
     ]
 }
