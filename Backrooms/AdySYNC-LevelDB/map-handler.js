@@ -57,12 +57,15 @@
         if (isPending) return;
         isPending = true;
         requestAnimationFrame(() => {
-            const rect = getRect();
-            centerX = clamp(centerX);
-            centerZ = clamp(centerZ);
-            updateGrid(rect.width, rect.height);
-            window.MapEngine?.onViewportChange?.();
-            isPending = false;
+            try {
+                const rect = getRect();
+                centerX = clamp(centerX);
+                centerZ = clamp(centerZ);
+                updateGrid(rect.width, rect.height);
+                window.MapEngine?.onViewportChange?.();
+            } finally {
+                isPending = false;
+            }
         });
     }
 
@@ -195,6 +198,7 @@
 
     const handlePointerDown = (e) => {
         if (e.button !== 0 || e.target.closest('.map-point-container, .ui-info-sidebar')) return;
+        e.preventDefault();
         dragging = true;
         startX = e.clientX; startY = e.clientY;
         startCenterX = centerX; startCenterZ = centerZ;
@@ -211,12 +215,14 @@
     };
 
     const stopDrag = () => { dragging = false; mapSurface.classList.remove('dragging'); };
+    const preventNativeDrag = e => e.preventDefault();
     const handlePointerLeave = () => !dragging && coordOut && (coordOut.textContent = "X -----, Z -----");
 
     mapSurface.addEventListener('wheel', handleWheel, { passive: false });
+    mapSurface.addEventListener('dragstart', preventNativeDrag);
     mapSurface.addEventListener('pointerdown', handlePointerDown);
     mapSurface.addEventListener('pointermove', handlePointerMove);
-    ['pointerup', 'pointercancel'].forEach(evt => mapSurface.addEventListener(evt, stopDrag));
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(evt => mapSurface.addEventListener(evt, stopDrag));
     mapSurface.addEventListener('pointerleave', handlePointerLeave);
 
     // ResizeObserver instead of window 'resize': catches container-only
@@ -248,9 +254,10 @@
             clearTimeout(initTimeout);
             resizeObserver.disconnect();
             mapSurface.removeEventListener('wheel', handleWheel);
+            mapSurface.removeEventListener('dragstart', preventNativeDrag);
             mapSurface.removeEventListener('pointerdown', handlePointerDown);
             mapSurface.removeEventListener('pointermove', handlePointerMove);
-            ['pointerup', 'pointercancel'].forEach(evt => mapSurface.removeEventListener(evt, stopDrag));
+            ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(evt => mapSurface.removeEventListener(evt, stopDrag));
             mapSurface.removeEventListener('pointerleave', handlePointerLeave);
             gridCanvas.remove();
         }

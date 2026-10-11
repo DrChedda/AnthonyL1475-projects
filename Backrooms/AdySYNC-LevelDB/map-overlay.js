@@ -408,7 +408,13 @@
     function renderActiveViewportContent() {
         if (isRenderPending) return;
         isRenderPending = true;
-        requestAnimationFrame(() => { drawViewport(); isRenderPending = false; });
+        requestAnimationFrame(() => {
+            try {
+                drawViewport();
+            } finally {
+                isRenderPending = false;
+            }
+        });
     }
 
     function buildPointElements() {
