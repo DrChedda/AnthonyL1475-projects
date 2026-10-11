@@ -29,8 +29,38 @@
 
     const sidebar = document.querySelector('.sidebar');
     const levelGroupContainer = document.querySelector('.level-btn-group');
+    const mapControls = document.querySelector('.map-controls');
+    const fullscreenButton = mapControls?.querySelector('[data-map-control="fullscreen"]');
 
     let currentActiveLevel = '0';
+
+    function updateFullscreenButton() {
+        if (!fullscreenButton) return;
+        fullscreenButton.textContent = document.fullscreenElement ? 'Exit Fullscreen' : 'Fullscreen';
+    }
+
+    const handleMapControlClick = async (e) => {
+        const button = e.target.closest('[data-map-control]');
+        if (!button) return;
+
+        const control = button.getAttribute('data-map-control');
+        if (control === 'walls' || control === 'locations') {
+            const enabled = button.getAttribute('aria-pressed') !== 'true';
+            button.setAttribute('aria-pressed', String(enabled));
+            if (control === 'walls') window.MapOverlay?.setWallsVisible(enabled);
+            else window.MapOverlay?.setLocationsVisible(enabled);
+            return;
+        }
+
+        if (control === 'fullscreen') {
+            try {
+                if (document.fullscreenElement) await document.exitFullscreen();
+                else await document.documentElement.requestFullscreen();
+            } catch (error) {
+                console.error('Could not toggle map fullscreen mode.', error);
+            }
+        }
+    };
 
     function getRootParentId(levelId) {
         const levelObj = AVAILABLE_LEVELS.find(lvl => lvl.id === levelId);
@@ -141,6 +171,9 @@
     if (levelGroupContainer) {
         levelGroupContainer.addEventListener('click', handleContainerClick);
     }
+    mapControls?.addEventListener('click', handleMapControlClick);
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    updateFullscreenButton();
     const coordinateButton = sidebar?.querySelector('.sidebar-coordinate-readout');
     coordinateButton?.addEventListener('click', handleCoordinateClick);
 
@@ -149,6 +182,8 @@
     window.MapUI = {
         updateSidebar,
         destroy: () => {
+            mapControls?.removeEventListener('click', handleMapControlClick);
+            document.removeEventListener('fullscreenchange', updateFullscreenButton);
             if (levelGroupContainer) {
                 levelGroupContainer.removeEventListener('click', handleContainerClick);
             }

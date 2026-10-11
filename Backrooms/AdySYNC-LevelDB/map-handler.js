@@ -40,7 +40,7 @@
         x: clamp(Math.round(centerX + ((sY - r.height * 0.5) * studsPerPixel)))
     });
 
-    function getSteps(rawStep) {
+    function getMinorStep(rawStep) {
         let pwr = 1;
         let temp = rawStep;
         if (temp >= 1) {
@@ -50,7 +50,7 @@
         }
         const ratio = rawStep / pwr;
         const majorStep = pwr * (ratio >= 5 ? 5 : ratio >= 2 ? 2 : 1);
-        return { majorStep, minorStep: majorStep / 5 };
+        return majorStep / 5;
     }
 
     function applyTransform() {
@@ -76,9 +76,10 @@
     }
 
     function updateGrid(w, h) {
-        if (gridCanvas.width !== w || gridCanvas.height !== h) {
-            gridCanvas.width = w;
-            gridCanvas.height = h;
+        const canvasWidth = Math.round(w), canvasHeight = Math.round(h);
+        if (gridCanvas.width !== canvasWidth || gridCanvas.height !== canvasHeight) {
+            gridCanvas.width = canvasWidth;
+            gridCanvas.height = canvasHeight;
         }
         gridCtx.clearRect(0, 0, w, h);
 
@@ -112,15 +113,8 @@
         const visStuds = w * studsPerPixel;
         if (walls) walls.classList.toggle('hidden', visStuds > 2e7);
 
-        let majorStep, minorStep;
         const sectorGrid = visStuds >= 5e5 && visStuds <= 2e7;
-        if (sectorGrid) {
-            majorStep = 2e6; minorStep = 2e6;
-        } else {
-            const steps = getSteps(120 * studsPerPixel);
-            majorStep = steps.majorStep;
-            minorStep = steps.minorStep;
-        }
+        const minorStep = sectorGrid ? 2e6 : getMinorStep(120 * studsPerPixel);
 
         const halfMinor = minorStep * 0.5;
         const minZ = centerZ - halfW * studsPerPixel;
@@ -132,7 +126,7 @@
         const startIdxX = Math.floor((minX - halfMinor) / minorStep);
         const endIdxX = Math.ceil((maxX - halfMinor) / minorStep);
 
-        if ((endIdxZ - startIdxZ) > 500 || bH <= 0 || bW <= 0) return;
+        if (endIdxZ - startIdxZ > 500 || endIdxX - startIdxX > 500 || bH <= 0 || bW <= 0) return;
 
         const isMajorIndex = i => sectorGrid || ((i - 2) % 5 + 5) % 5 === 0;
         const gridOffset = 0.5;

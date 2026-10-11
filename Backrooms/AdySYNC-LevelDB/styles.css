@@ -231,6 +231,45 @@ body {
 .level-btn-group::-webkit-scrollbar {
     display: none;
 }
+.map-controls {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.map-control-btn {
+    background: #1a1d21;
+    color: #a3a8a6;
+    border: 1px solid rgba(118, 123, 121, 0.3);
+    border-radius: 0;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.map-control-btn:hover {
+    background: #252a30;
+    color: #ffffff;
+}
+.map-control-btn[aria-pressed="false"] {
+    background: #101214;
+    color: #858b8a;
+    border-color: rgba(118, 123, 121, 0.2);
+}
+.map-control-btn[aria-pressed="false"]:hover {
+    background: #191c20;
+    color: #c3c7c5;
+    border-color: rgba(118, 123, 121, 0.4);
+}
+.map-control-btn:focus-visible {
+    outline: 2px solid #ffd97d;
+    outline-offset: 2px;
+}
 .ui-level-btn {
     background: #1a1d21;
     color: #a3a8a6;
@@ -312,6 +351,12 @@ body {
 
 .notice strong {
     color: #ffd97d;
+}
+html:fullscreen .sidebar {
+    display: none;
+}
+html:fullscreen .map-app {
+    width: 100vw;
 }
 .sidebar {
     position: fixed;
