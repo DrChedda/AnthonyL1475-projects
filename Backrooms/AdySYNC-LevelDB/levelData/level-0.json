@@ -118,6 +118,7 @@
             "x": 0,
             "z": 0,
             "name": "Beacon",
+            "color": "#ffd97d",
             "layer": 2,
             "description": "Its beacon there is a beacon icon visible from across the inside of the infinitelands walls."
         },
@@ -264,8 +265,8 @@
             "layer": 0
         },
         {
-            "x": null,
-            "z": null,
+            "x": -1300,
+            "z": 2000,
             "name": "Sinkhole",
             "color": "lightgreen",
             "layer": 0
@@ -275,6 +276,20 @@
             "z": 0,
             "name": "Calm",
             "color": "darkblue",
+            "layer": 0
+        },
+        {
+            "x": -4524,
+            "z": 994,
+            "name": "0.7 Entrance",
+            "color": "lightgreen",
+            "layer": 0
+        },
+        {
+            "x": 3870,
+            "z": 1980,
+            "name": "FUN Entrance",
+            "color": "red",
             "layer": 0
         }
     ]
