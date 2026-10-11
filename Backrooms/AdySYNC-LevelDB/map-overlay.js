@@ -71,6 +71,7 @@
     const ctx = canvas.getContext('2d');
 
     let currentLevelData = null, wallData = [], pointsData = [], pointElements = [], sectorNamesData = {}, isRenderPending = false;
+    const warnedWallColors = new Set();
     const SECTOR_SIZE = 2e6;
 
     const columnLetterCache = new Map();
@@ -151,58 +152,77 @@
         if (wallData?.length > 0 && LayerManager.isVisible(wallsLevelLayer, visStuds)) {
             const wallWidth = 3;
             ctx.lineWidth = wallWidth;
-            ctx.strokeStyle = '#4378c9';
-            ctx.fillStyle = '#4378c9';
+            const defaultWallColor = '#4378c9';
 
             const wallVisible = p => {
                 if (!p || p.x == null || p.z == null || Math.abs(p.x) > LIMIT || Math.abs(p.z) > LIMIT) return false;
                 return LayerManager.isVisible(resolveLayerId(p.layer ?? wallsLevelLayer), visStuds);
             };
 
-            if (wallData.length === 1) {
-                const p = wallData[0];
-                if (wallVisible(p)) {
-                    const posX = toX(p.z), posY = toY(p.x);
-                    if (inView(posX, posY, wallWidth)) {
-                        ctx.beginPath();
-                        ctx.arc(posX, posY, wallWidth * 0.5, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
+            const resolveWallColor = color => {
+                if (typeof color !== 'string') return defaultWallColor;
+                if (CSS.supports('color', color)) return color;
+                if (!warnedWallColors.has(color)) {
+                    console.warn(`Ignoring invalid wall color: ${color}`);
+                    warnedWallColors.add(color);
                 }
-            } else {
-                ctx.beginPath();
+                return defaultWallColor;
+            };
 
-                for (let i = 0, len = wallData.length; i < len; i++) {
-                    const curr = wallData[i];
-                    if (!wallVisible(curr)) continue;
+            const wallSegments = [[]];
+            let currentWallColor = defaultWallColor;
+            for (const point of wallData) {
+                if (point === null) {
+                    if (wallSegments[wallSegments.length - 1].length) wallSegments.push([]);
+                    continue;
+                }
 
-                    const next = wallData[i + 1];
-                    const prev = wallData[i - 1];
-                    const p1X = toX(curr.z), p1Y = toY(curr.x);
-                    const hasNext = wallVisible(next);
-                    const hasPrev = wallVisible(prev);
+                if (point && typeof point.color === 'string') {
+                    currentWallColor = resolveWallColor(point.color);
+                    if (point.x == null || point.z == null) continue;
+                }
+                wallSegments[wallSegments.length - 1].push({ point, color: currentWallColor });
+            }
 
-                    if (!hasNext && !hasPrev) {
-                        if (inView(p1X, p1Y, wallWidth)) {
-                            ctx.moveTo(p1X + wallWidth * 0.5, p1Y);
-                            ctx.arc(p1X, p1Y, wallWidth * 0.5, 0, Math.PI * 2);
-                        }
-                        continue;
+            const pathsByColor = new Map();
+            const getPath = color => {
+                if (!pathsByColor.has(color)) pathsByColor.set(color, new Path2D());
+                return pathsByColor.get(color);
+            };
+
+            for (const segment of wallSegments) {
+                for (let i = 0; i < segment.length; i++) {
+                    const curr = segment[i];
+                    if (!wallVisible(curr.point)) continue;
+
+                    const prev = segment[i - 1];
+                    const next = segment[i + 1];
+                    const hasPrev = prev && wallVisible(prev.point);
+                    const hasNext = next && wallVisible(next.point);
+                    const p1X = toX(curr.point.z), p1Y = toY(curr.point.x);
+                    const path = getPath(curr.color);
+
+                    if (!hasNext && !hasPrev && inView(p1X, p1Y, wallWidth)) {
+                        path.moveTo(p1X + wallWidth * 0.5, p1Y);
+                        path.arc(p1X, p1Y, wallWidth * 0.5, 0, Math.PI * 2);
                     }
 
                     if (hasNext) {
-                        const p2X = toX(next.z), p2Y = toY(next.x);
-
+                        const p2X = toX(next.point.z), p2Y = toY(next.point.x);
                         if (Math.max(p1X, p2X) < 0 || Math.min(p1X, p2X) > w ||
                             Math.max(p1Y, p2Y) < 0 || Math.min(p1Y, p2Y) > h) continue;
 
-                        ctx.moveTo(p1X, p1Y);
-                        ctx.lineTo(p2X, p2Y);
+                        getPath(next.color).moveTo(p1X, p1Y);
+                        getPath(next.color).lineTo(p2X, p2Y);
                     }
                 }
+            }
 
-                ctx.stroke();
-                ctx.fill();
+            for (const [color, path] of pathsByColor) {
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.stroke(path);
+                ctx.fill(path);
             }
         }
 
@@ -439,10 +459,7 @@
             const marker = document.createElement('div');
             marker.className = 'point-marker';
             if (point.color) {
-                Object.assign(marker.style, {
-                    backgroundColor: point.color,
-                    boxShadow: `0 0 8px ${point.color}`
-                });
+                marker.style.backgroundColor = point.color;
             }
             container.appendChild(marker);
 
