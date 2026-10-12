@@ -191,7 +191,7 @@
     };
 
     const handlePointerDown = (e) => {
-        if (e.button !== 0 || e.target.closest('.map-point-container, .ui-info-sidebar')) return;
+        if (e.button !== 0 || e.target.closest('.map-point-container, .ui-info-sidebar, .popup-notifications')) return;
         e.preventDefault();
         dragging = true;
         startX = e.clientX; startY = e.clientY;

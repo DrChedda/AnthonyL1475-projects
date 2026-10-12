@@ -27,7 +27,7 @@ body {
     inset: 0;
     overflow: hidden;
     border: 1px solid rgba(84, 98, 115, 0.45);
-    border-radius: 18px;
+    border-radius: 0;
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
     cursor: grab;
     touch-action: none;
@@ -44,6 +44,96 @@ body {
 }
 .map-surface.dragging {
     cursor: grabbing;
+}
+.popup-notifications {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: min(420px, 100%);
+    pointer-events: none;
+}
+.popup-notification {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 10px 10px 14px;
+    border: 1px solid rgba(118, 123, 121, 0.3);
+    border-left: 3px solid #75a7d8;
+    border-radius: 0;
+    background: #1a1d21;
+    color: #f5efe2;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    font-size: 13px;
+    line-height: 1.4;
+    pointer-events: auto;
+    animation: popup-notification-enter 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes popup-notification-enter {
+    from {
+        opacity: 0;
+        transform: translateX(-24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+.popup-notification--success {
+    border-left-color: #65b982;
+}
+.popup-notification--warning {
+    border-left-color: #e9b44c;
+}
+.popup-notification--error {
+    border-left-color: #e35d6a;
+}
+.popup-notification__message {
+    overflow-wrap: anywhere;
+}
+.popup-notification__dismiss {
+    position: relative;
+    display: flex;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: rgba(245, 239, 226, 0.72);
+    cursor: pointer;
+}
+.popup-notification__dismiss::before,
+.popup-notification__dismiss::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 13px;
+    height: 1.5px;
+    background: currentColor;
+    content: '';
+}
+.popup-notification__dismiss::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.popup-notification__dismiss::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+.popup-notification__dismiss:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+    .popup-notification {
+        animation: none;
+    }
 }
 .map-world {
     position: absolute;
@@ -131,6 +221,25 @@ body {
     border: 2px solid white;
     border-radius: 50%;
     transform: none; 
+}
+.point-marker[data-shape="square"] {
+    border-radius: 0;
+}
+.point-marker[data-shape="diamond"] {
+    border-radius: 0;
+    transform: rotate(45deg) scale(0.78);
+}
+.point-marker[data-shape="triangle"] {
+    border: 0;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.point-marker[data-shape="star"] {
+    border: 0;
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 93%, 50% 71%, 21% 93%, 32% 57%, 2% 35%, 39% 35%);
+}
+.point-marker[data-shape="hexagon"] {
+    border-radius: 0;
+    clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
 }
 .point-label {
     position: absolute;
@@ -281,7 +390,7 @@ body {
     flex-shrink: 0;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .ui-level-btn:hover {
     background: #252a30;
@@ -291,6 +400,10 @@ body {
     background: #2e353d;
     color: #ffffff;
     border-color: #8d816d;
+}
+.ui-level-btn:focus-visible {
+    outline: 2px solid #ffd97d;
+    outline-offset: 2px;
 }
 .ui-level-btn.sub-level-btn {
     font-size: 12px;
@@ -329,13 +442,6 @@ body {
     border-right: 1px solid rgba(118, 123, 121, 0.3);
     padding-right: 10px;
     flex-shrink: 0;
-}
-.coord-readout span {
-    display: block;
-    font-size: 0.5rem;
-    letter-spacing: 0.58em;
-    text-transform: uppercase;
-    color: #828f9d;
 }
 .notice {
     margin-left: 0;

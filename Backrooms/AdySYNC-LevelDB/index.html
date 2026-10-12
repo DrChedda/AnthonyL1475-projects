@@ -9,6 +9,7 @@
   <body>
     <div class="map-app">
       <div class="map-surface" id="mapSurface" aria-label="Backrooms map canvas">
+        <div class="popup-notifications" id="popupNotifications" aria-live="polite"></div>
         <div class="map-world" id="mapWorld">
           <div class="axis-overlay">
             <div class="axis-line axis-line--vertical"></div>
@@ -65,6 +66,7 @@
     </div>
 
     <script src="https://p.trellocdn.com/embed.min.js"></script>
+    <script src="popup-notification.js"></script>
     <script src="map-handler.js"></script>
     <script src="ui-controller.js"></script>
     <script src="map-overlay.js"></script>

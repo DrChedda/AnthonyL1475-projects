@@ -58,6 +58,7 @@
                 else await document.documentElement.requestFullscreen();
             } catch (error) {
                 console.error('Could not toggle map fullscreen mode.', error);
+                window.PopupNotification?.show('Could not toggle map fullscreen mode.', { type: 'error' });
             }
         }
     };
@@ -162,9 +163,11 @@
         try {
             await navigator.clipboard.writeText(coordinateEl.textContent);
             coordinateEl.title = 'Copied to clipboard';
+            window.PopupNotification?.show('Coordinates copied to clipboard.', { type: 'success' });
         } catch (error) {
             console.error('Could not copy point coordinates to the clipboard.', error);
             coordinateEl.title = 'Could not copy coordinates';
+            window.PopupNotification?.show('Could not copy point coordinates to the clipboard.', { type: 'error' });
         }
     };
 

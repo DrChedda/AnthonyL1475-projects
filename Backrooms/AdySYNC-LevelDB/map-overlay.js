@@ -80,6 +80,7 @@
     const warnedWallColors = new Set();
     const renderedLabels = new Map();
     const SECTOR_SIZE = 2e6;
+    const markerShapes = new Set(['circle', 'square', 'diamond', 'triangle', 'star', 'hexagon']);
 
     const columnLetterCache = new Map();
     const getColumnLetter = col => {
@@ -176,6 +177,7 @@
                 if (!warnedWallColors.has(color)) {
                     console.warn(`Ignoring invalid wall color: ${color}`);
                     warnedWallColors.add(color);
+                    window.PopupNotification?.show(`Ignoring invalid wall color: ${color}`, { type: 'warning' });
                 }
                 return defaultWallColor;
             };
@@ -495,6 +497,8 @@
 
             const marker = document.createElement('div');
             marker.className = 'point-marker';
+            const shape = markerShapes.has(point.shape) ? point.shape : 'circle';
+            marker.setAttribute('data-shape', shape);
             if (point.color) {
                 marker.style.backgroundColor = point.color;
             }
@@ -517,8 +521,12 @@
 
     function loadLevel(levelNum = 0) {
         const requestVersion = ++levelLoadVersion;
-        fetch(`./levelData/level-${levelNum}.json`)
-            .then(res => res.ok ? res.json() : Promise.reject(`Level data missing for level-${levelNum}`))
+        const levelFile = `levelData/level-${levelNum}.json`;
+        fetch(`./${levelFile}`)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
             .then(data => {
                 if (requestVersion !== levelLoadVersion) return;
                 currentLevelData = data.autoCenter ? centerLevelData(data) : data;
@@ -567,6 +575,8 @@
             .catch(err => {
                 if (requestVersion !== levelLoadVersion) return;
                 console.warn(err, "Defaulting to empty viewport.");
+                const reason = err instanceof Error ? err.message : String(err);
+                window.PopupNotification?.show(`Could not load "${levelFile}": ${reason}`, { type: 'error' });
                 currentLevelData = null;
                 wallData = []; pointsData = []; sectorNamesData = {};
                 buildPointElements();
