@@ -187,30 +187,34 @@
         {
             "x": -4680,
             "z": -664,
-            "name": "Northern Inlands Entrance",
+            "name": "Northern Inflands Entrance",
             "color": "blue",
-            "layer": 0
+            "layer": 0,
+            "shape": "square"
         },
         {
             "x": 1000,
             "z": 3960,
-            "name": "Western Inlands Entrance",
+            "name": "Western Inflands Entrance",
             "color": "blue",
-            "layer": 0
+            "layer": 0,
+            "shape": "square"
         },
         {
             "x": 3360,
             "z": 1270,
-            "name": "Southern Inlands Entrance",
+            "name": "Southern Inflands Entrance",
             "color": "blue",
-            "layer": 0
+            "layer": 0,
+            "shape": "square"
         },
         {
             "x": 1140,
             "z": -5040,
-            "name": "Eastern Inlands Entrance",
+            "name": "Eastern Inflands Entrance",
             "color": "blue",
-            "layer": 0
+            "layer": 0,
+            "shape": "square"
         },
         {
             "x": 4890,

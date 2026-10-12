@@ -351,7 +351,18 @@
                 container.style.top = `${pointY}px`;
                 if (label) visibleLabels.push({ container, label, pointX, pointY });
             });
-            resolvePointLabelCollisions(visibleLabels);
+            const centerlineLabelRects = [];
+            renderedLabels.forEach((label, key) => {
+                if (!activeLabelKeys.has(key) || !key.startsWith('axis:')) return;
+                const labelRect = label.getBoundingClientRect();
+                centerlineLabelRects.push({
+                    left: labelRect.left - rect.left,
+                    top: labelRect.top - rect.top,
+                    right: labelRect.right - rect.left,
+                    bottom: labelRect.bottom - rect.top
+                });
+            });
+            resolvePointLabelCollisions(visibleLabels, centerlineLabelRects);
         }
 
         renderedLabels.forEach((label, key) => {
@@ -414,7 +425,8 @@
     const rectsOverlap = (leftA, topA, rightA, bottomA, leftB, topB, rightB, bottomB) =>
         leftA < rightB && rightA > leftB && topA < bottomB && bottomA > topB;
 
-    function resolvePointLabelCollisions(entries) {
+    function resolvePointLabelCollisions(entries, obstacles) {
+        const placedLabels = [];
         entries.forEach(entry => {
             entry.width = entry.label.offsetWidth || 64;
             entry.height = entry.label.offsetHeight || 14;
@@ -422,7 +434,7 @@
             entry.label._labelOffsetY = 0;
         });
 
-        entries.forEach((entry, index) => {
+        entries.forEach(entry => {
             let chosen = null;
 
             for (const placement of labelPlacements) {
@@ -451,29 +463,46 @@
                     collides = true;
                 }
 
-                for (let i = 0; i < entries.length; i++) {
-                    if (i === index) continue;
+                if (obstacles.some(obstacle =>
+                    rectsOverlap(boxLeft, boxTop, boxRight, boxBottom, obstacle.left, obstacle.top, obstacle.right, obstacle.bottom)
+                )) {
+                    collides = true;
+                }
 
-                    const other = entries[i];
-                    const otherLeft = other.pointX + (other.label._labelOffsetX ?? 0) - (other.width * 0.5);
-                    const otherRight = otherLeft + other.width;
-                    const otherTop = other.pointY + (other.label._labelOffsetY ?? 0);
-                    const otherBottom = otherTop + other.height;
-
-                    if (rectsOverlap(boxLeft, boxTop, boxRight, boxBottom, otherLeft, otherTop, otherRight, otherBottom) ||
-                        circleIntersectsRect(other.pointX, other.pointY, 5, boxLeft, boxTop, boxRight, boxBottom)) {
+                for (const other of entries) {
+                    if (circleIntersectsRect(other.pointX, other.pointY, 5, boxLeft, boxTop, boxRight, boxBottom)) {
                         collides = true;
                         break;
                     }
                 }
 
+                if (!collides && placedLabels.some(other =>
+                    rectsOverlap(boxLeft, boxTop, boxRight, boxBottom, other.left, other.top, other.right, other.bottom)
+                )) {
+                    collides = true;
+                }
+
                 if (!collides) {
                     chosen = { x: offsetX, y: offsetY };
+                    placedLabels.push({
+                        left: boxLeft,
+                        top: boxTop,
+                        right: boxRight,
+                        bottom: boxBottom
+                    });
                     break;
                 }
             }
 
-            if (!chosen) chosen = { x: 0, y: labelGap };
+            if (!chosen) {
+                chosen = { x: 0, y: labelGap };
+                placedLabels.push({
+                    left: entry.pointX,
+                    top: entry.pointY + labelGap,
+                    right: entry.pointX + entry.width,
+                    bottom: entry.pointY + labelGap + entry.height
+                });
+            }
             entry.label._labelOffsetX = chosen.x;
             entry.label._labelOffsetY = chosen.y;
             entry.label.style.transform = `translate(${chosen.x}px, ${chosen.y}px)`;
