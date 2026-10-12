@@ -262,13 +262,6 @@
             "layer": 0
         },
         {
-            "x": -2250,
-            "z": -500,
-            "name": "FOMA Base",
-            "color": "lightcoral",
-            "layer": 0
-        },
-        {
             "x": 1800,
             "z": -5150,
             "name": "Unknown Outpost",
