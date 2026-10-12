@@ -75,7 +75,7 @@
     wallsLayer.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
-    let currentLevelData = null, wallData = [], pointsData = [], pointElements = [], sectorNamesData = {}, isRenderPending = false, levelLoadVersion = 0;
+    let currentLevelData = null, wallData = [], pointsData = [], sourcePointsData = [], pointElements = [], sectorNamesData = {}, isRenderPending = false, levelLoadVersion = 0;
     let wallsVisible = true, locationsVisible = true;
     const warnedWallColors = new Set();
     const renderedLabels = new Map();
@@ -108,35 +108,33 @@
         return Math.max(100, step || 1e6);
     }
 
-    function centerLevelData(data) {
-        const items = [...(data.walls || []), ...(data.locations || [])]
-            .filter(p => p && p.x != null && p.z != null);
-        if (!items.length) return data;
+    function getWallCenter(data) {
+        const walls = (data.walls || []).filter(point =>
+            point && Number.isFinite(point.x) && Number.isFinite(point.z)
+        );
+        if (!walls.length) return { x: 0, z: 0 };
 
-        let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-        items.forEach(p => {
-            if (p.x < minX) minX = p.x;
-            if (p.x > maxX) maxX = p.x;
-            if (p.z < minZ) minZ = p.z;
-            if (p.z > maxZ) maxZ = p.z;
+        const bounds = walls.reduce((result, point) => ({
+            minX: Math.min(result.minX, point.x),
+            maxX: Math.max(result.maxX, point.x),
+            minZ: Math.min(result.minZ, point.z),
+            maxZ: Math.max(result.maxZ, point.z)
+        }), {
+            minX: Infinity,
+            maxX: -Infinity,
+            minZ: Infinity,
+            maxZ: -Infinity
         });
 
-        if (minX === Infinity) return data;
-        const offX = (minX + maxX) * 0.5, offZ = (minZ + maxZ) * 0.5;
-
-        ['walls', 'locations'].forEach(key => {
-            if (data[key]) {
-                data[key] = data[key].map(p => p && p.x != null && p.z != null
-                    ? { ...p, x: Math.round(p.x - offX), z: Math.round(p.z - offZ) }
-                    : p);
-            }
-        });
-        return data;
+        return {
+            x: (bounds.minX + bounds.maxX) * 0.5,
+            z: (bounds.minZ + bounds.maxZ) * 0.5
+        };
     }
 
     function drawViewport() {
         if (!window.MapEngine) return;
-        const { studsPerPixel: spp, centerCoords: c, LIMIT } = window.MapEngine;
+        const { studsPerPixel: spp, centerCoords: c, coordinateOffset, LIMIT } = window.MapEngine;
         const rect = wallsLayer.parentElement.getBoundingClientRect();
         const w = rect.width, h = rect.height;
 
@@ -289,27 +287,45 @@
             if (LayerManager.isVisible(gridLayerId, visStuds)) {
                 const dynStep = getDynamicStep(spp), edge = 25;
                 const aZ = toX(0), aX = toY(0);
+                const axisX = Math.max(0, Math.min(aZ, w));
+                const axisY = Math.max(0, Math.min(aX, h));
+                const xLabelsGoRight = aZ <= 0;
+                const zLabelsGoUp = aX >= h;
 
-                if (aZ > 0 && aZ < w) {
+                if (w > 0 && h > 0) {
                     for (let xVal = Math.ceil((c.x - halfVisH) / dynStep) * dynStep; xVal <= Math.floor((c.x + halfVisH) / dynStep) * dynStep; xVal += dynStep) {
-                        if (!xVal || Math.abs(xVal) > LIMIT) continue;
+                        if (Math.abs(xVal) > LIMIT) continue;
                         const posY = toY(xVal);
                         if (posY > edge && posY < h - edge) {
                             const key = `axis:x:${xVal}`;
                             activeLabelKeys.add(key);
-                            createLabel(key, `X ${xVal.toLocaleString()}`, aZ - 8, posY, 'translate(-100%, -50%)');
+                            const displayX = Math.round(xVal + coordinateOffset.x);
+                            createLabel(
+                                key,
+                                `X ${displayX.toLocaleString()}`,
+                                xLabelsGoRight ? axisX + 8 : axisX - 8,
+                                posY,
+                                xLabelsGoRight ? 'translate(0, -50%)' : 'translate(-100%, -50%)'
+                            );
                         }
                     }
                 }
 
-                if (aX > 0 && aX < h) {
+                if (w > 0 && h > 0) {
                     for (let zVal = Math.ceil((c.z - halfVisW) / dynStep) * dynStep; zVal <= Math.floor((c.z + halfVisW) / dynStep) * dynStep; zVal += dynStep) {
                         if (Math.abs(zVal) > LIMIT) continue;
                         const posX = toX(zVal);
                         if (posX > edge && posX < w - edge) {
                             const key = `axis:z:${zVal}`;
                             activeLabelKeys.add(key);
-                            createLabel(key, zVal === 0 ? "0" : `Z ${zVal.toLocaleString()}`, posX - (zVal === 0 ? 8 : 0), aX + 8, zVal === 0 ? 'translate(-100%, 0%)' : 'translateX(-50%)');
+                            const displayZ = Math.round(zVal + coordinateOffset.z);
+                            createLabel(
+                                key,
+                                `Z ${displayZ.toLocaleString()}`,
+                                posX,
+                                axisY + (zLabelsGoUp ? -8 : 8),
+                                zLabelsGoUp ? 'translate(-50%, -100%)' : 'translateX(-50%)'
+                            );
                         }
                     }
                 }
@@ -482,12 +498,13 @@
         const fragment = document.createDocumentFragment();
         pointElements = [];
 
-        pointsData.forEach(point => {
+        pointsData.forEach((point, index) => {
             if (!point || point.x == null || point.z == null) return;
 
+            const sourcePoint = sourcePointsData[index] || point;
             const container = document.createElement('div');
             container.className = 'map-point-container';
-            container._pointData = point;
+            container._pointData = sourcePoint;
             Object.assign(container.style, {
                 position: 'absolute',
                 cursor: 'pointer',
@@ -512,7 +529,7 @@
                 container.appendChild(label);
             }
 
-            pointElements.push({ point, layerId: resolveLayerId(point.layer), container, label });
+            pointElements.push({ point, sourcePoint, layerId: resolveLayerId(point.layer), container, label });
             fragment.appendChild(container);
         });
 
@@ -529,9 +546,21 @@
             })
             .then(data => {
                 if (requestVersion !== levelLoadVersion) return;
-                currentLevelData = data.autoCenter ? centerLevelData(data) : data;
-                wallData = currentLevelData.walls || [];
-                pointsData = currentLevelData.locations || [];
+                currentLevelData = data;
+                const coordinateOffset = currentLevelData.autoCenter
+                    ? getWallCenter(currentLevelData)
+                    : { x: 0, z: 0 };
+                wallData = (currentLevelData.walls || []).map(point =>
+                    point && Number.isFinite(point.x) && Number.isFinite(point.z)
+                        ? { ...point, x: point.x - coordinateOffset.x, z: point.z - coordinateOffset.z }
+                        : point
+                );
+                sourcePointsData = currentLevelData.locations || [];
+                pointsData = sourcePointsData.map(point =>
+                    point && Number.isFinite(point.x) && Number.isFinite(point.z)
+                        ? { ...point, x: point.x - coordinateOffset.x, z: point.z - coordinateOffset.z }
+                        : point
+                );
                 sectorNamesData = currentLevelData.sectors || {};
                 buildPointElements();
 
@@ -554,7 +583,11 @@
                     if (currentLevelData.walls?.length) {
                         currentLevelData.walls.forEach(w => {
                             if (w && w.x !== undefined && w.z !== undefined) {
-                                maxWallDist = Math.max(maxWallDist, Math.abs(w.x), Math.abs(w.z));
+                                maxWallDist = Math.max(
+                                    maxWallDist,
+                                    Math.abs(w.x - coordinateOffset.x),
+                                    Math.abs(w.z - coordinateOffset.z)
+                                );
                             }
                         });
                     }
@@ -565,10 +598,18 @@
                     window.MapEngine.minStudsPerPixel = 0.05;
                     window.MapEngine.studsPerPixel = (effectiveWallDist * 2.4) / minDim;
 
-                    window.MapEngine.centerCoords = { x: 0, z: 0 };
                     window.MapEngine.onViewportChange = renderActiveViewportContent;
 
-                    window.MapEngine.setLimit(activeLimit);
+                    const absoluteLimit = currentLevelData.autoCenter
+                        ? [...wallData, ...pointsData].reduce((limit, point) => {
+                            if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.z)) return limit;
+                            return Math.max(limit, Math.abs(point.x), Math.abs(point.z));
+                        }, activeLimit)
+                        : activeLimit;
+
+                    window.MapEngine.setLimit(absoluteLimit);
+                    window.MapEngine.coordinateOffset = coordinateOffset;
+                    window.MapEngine.centerCoords = { x: 0, z: 0 };
                     window.MapEngine.applyTransform();
                 }
             })
@@ -578,8 +619,13 @@
                 const reason = err instanceof Error ? err.message : String(err);
                 window.PopupNotification?.show(`Could not load "${levelFile}": ${reason}`, { type: 'error' });
                 currentLevelData = null;
-                wallData = []; pointsData = []; sectorNamesData = {};
+                wallData = []; pointsData = []; sourcePointsData = []; sectorNamesData = {};
                 buildPointElements();
+                if (window.MapEngine) {
+                    window.MapEngine.coordinateOffset = { x: 0, z: 0 };
+                    window.MapEngine.centerCoords = { x: 0, z: 0 };
+                    window.MapEngine.setLimit(1e9);
+                }
                 if (coordTagEl) coordTagEl.textContent = `Level-${levelNum}`;
                 window.MapEngine?.applyTransform();
             });

@@ -26,6 +26,7 @@
     const gridCtx = gridCanvas.getContext('2d');
 
     let LIMIT = 1e9, centerX = 0, centerZ = 0, studsPerPixel = 10;
+    let coordinateOffset = { x: 0, z: 0 };
     let dragging = false, startX = 0, startY = 0, startCenterX = 0, startCenterZ = 0, isPending = false;
     let cachedRect = null;
     function getRect() {
@@ -101,9 +102,15 @@
 
         const originX = toScreenX(0);
         const originY = toScreenY(0);
+        const visibleOriginX = Math.max(0, Math.min(originX, w));
+        const visibleOriginY = Math.max(0, Math.min(originY, h));
 
-        if (axisV) setBorder(axisV, !(originX < bL || originX > bR || cT >= cB), { left: `${originX}px`, top: `${cT}px`, height: `${bH}px` });
-        if (axisH) setBorder(axisH, !(originY < bB || originY > bT || cL >= cR), { top: `${originY}px`, left: `${cL}px`, width: `${bW}px` });
+        if (axisV) {
+            setBorder(axisV, w > 0 && h > 0, { left: `${visibleOriginX}px`, top: '0px', height: `${h}px` });
+        }
+        if (axisH) {
+            setBorder(axisH, w > 0 && h > 0, { top: `${visibleOriginY}px`, left: '0px', width: `${w}px` });
+        }
 
         setBorder(borders.left, bH > 0 && bL >= 0 && bL <= w, { left: `${bL}px`, top: `${cT}px`, width: '3px', height: `${bH}px`, transform: 'translateX(-50%)' });
         setBorder(borders.right, bH > 0 && bR >= 0 && bR <= w, { left: `${bR}px`, top: `${cT}px`, width: '3px', height: `${bH}px`, transform: 'translateX(-50%)' });
@@ -116,20 +123,19 @@
         const sectorGrid = visStuds >= 5e5 && visStuds <= 2e7;
         const minorStep = sectorGrid ? 2e6 : getMinorStep(120 * studsPerPixel);
 
-        const halfMinor = minorStep * 0.5;
         const minZ = centerZ - halfW * studsPerPixel;
         const maxZ = centerZ + halfW * studsPerPixel;
         const minX = centerX - halfH * studsPerPixel;
         const maxX = centerX + halfH * studsPerPixel;
-        const startIdxZ = Math.floor((minZ - halfMinor) / minorStep);
-        const endIdxZ = Math.ceil((maxZ - halfMinor) / minorStep);
-        const startIdxX = Math.floor((minX - halfMinor) / minorStep);
-        const endIdxX = Math.ceil((maxX - halfMinor) / minorStep);
+        const gridOffset = sectorGrid ? 0.5 : 0;
+        const startIdxZ = Math.ceil(minZ / minorStep - gridOffset);
+        const endIdxZ = Math.floor(maxZ / minorStep - gridOffset);
+        const startIdxX = Math.ceil(minX / minorStep - gridOffset);
+        const endIdxX = Math.floor(maxX / minorStep - gridOffset);
 
         if (endIdxZ - startIdxZ > 500 || endIdxX - startIdxX > 500 || bH <= 0 || bW <= 0) return;
 
-        const isMajorIndex = i => sectorGrid || ((i - 2) % 5 + 5) % 5 === 0;
-        const gridOffset = 0.5;
+        const isMajorIndex = i => sectorGrid || i % 5 === 0;
 
         // Single pass per axis: bucket each line into a minor/major Path2D
         // instead of re-scanning the whole index range twice (once per pass,
@@ -174,7 +180,9 @@
     function updateCoords(eX, eY) {
         if (!coordOut) return;
         const r = getRect();
-        const { x, z } = toWorld(eX - r.left, eY - r.top, r);
+        const world = toWorld(eX - r.left, eY - r.top, r);
+        const x = world.x + coordinateOffset.x;
+        const z = world.z + coordinateOffset.z;
         coordOut.textContent = `${Math.round(x).toLocaleString('en-US')} X, ${Math.round(z).toLocaleString('en-US')} Z`;
     }
 
@@ -242,6 +250,10 @@
         set centerCoords({ x, z }) {
             if (x !== undefined) centerX = clamp(x);
             if (z !== undefined) centerZ = clamp(z);
+        },
+        get coordinateOffset() { return { ...coordinateOffset }; },
+        set coordinateOffset({ x = 0, z = 0 }) {
+            coordinateOffset = { x, z };
         },
         get LIMIT() { return LIMIT; },
         destroy: () => {
