@@ -125,9 +125,11 @@
 
     function drawViewport() {
         if (!window.MapEngine) return;
-        const { studsPerPixel: spp, centerCoords: c, coordinateOffset, LIMIT } = window.MapEngine;
+        const { coordinateOffset, LIMIT } = window.MapEngine;
         const rect = wallsLayer.parentElement.getBoundingClientRect();
-        const w = rect.width, h = rect.height;
+        const viewport = window.MapEngine.getViewport();
+        const { width: w, height: h, centerCoords: c, bounds, studsPerPixel: spp, visibleStuds: visStuds } = viewport;
+        const { minX: minVisX, maxX: maxVisX, minZ: minVisZ, maxZ: maxVisZ } = bounds;
 
         const canvasWidth = Math.round(w), canvasHeight = Math.round(h);
         if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
@@ -135,16 +137,8 @@
             canvas.height = canvasHeight;
         }
 
-        const sCX = w * 0.5;
-        const sCY = h * 0.5;
-        const invSpp = 1 / spp;
-        const visStuds = w * spp;
-        const halfVisW = (w * 0.5) * spp;
-        const halfVisH = (h * 0.5) * spp;
-        const minVisZ = c.z - halfVisW, maxVisZ = c.z + halfVisW;
-        const minVisX = c.x - halfVisH, maxVisX = c.x + halfVisH;
-        const toX = z => sCX - ((z - c.z) * invSpp);
-        const toY = x => sCY + ((x - c.x) * invSpp);
+        const toX = x => viewport.worldToScreen({ x, z: c.z }).x;
+        const toY = z => viewport.worldToScreen({ x: c.x, z }).y;
         const inView = (x, y, pad = 0) => x >= -pad && x <= w + pad && y >= -pad && y <= h + pad;
 
         ctx.clearRect(0, 0, w, h);
@@ -203,7 +197,7 @@
                     const next = segment[i + 1];
                     const hasPrev = prev && wallVisible(prev.point);
                     const hasNext = next && wallVisible(next.point);
-                    const p1X = toX(curr.point.z), p1Y = toY(curr.point.x);
+                    const p1X = toX(curr.point.x), p1Y = toY(curr.point.z);
                     const path = getPath(curr.color);
 
                     if (!hasNext && !hasPrev && inView(p1X, p1Y, wallWidth)) {
@@ -212,7 +206,7 @@
                     }
 
                     if (hasNext) {
-                        const p2X = toX(next.point.z), p2Y = toY(next.point.x);
+                        const p2X = toX(next.point.x), p2Y = toY(next.point.z);
                         if (Math.max(p1X, p2X) < 0 || Math.min(p1X, p2X) > w ||
                             Math.max(p1Y, p2Y) < 0 || Math.min(p1Y, p2Y) > h) continue;
 
@@ -238,7 +232,7 @@
                 const border = currentLevelData?.worldBorder;
                 const borderLayerId = currentLevelData?.borderLayer || 'border';
                 if (border > 0 && LayerManager.isVisible(borderLayerId, visStuds)) {
-                    const bL = toX(border), bR = toX(-border), bT = toY(-border), bB = toY(border);
+                    const bL = toX(-border), bR = toX(border), bT = toY(-border), bB = toY(border);
                     Object.assign(bBox.style, { left: `${bL}px`, top: `${bT}px`, width: `${bR - bL}px`, height: `${bB - bT}px`, display: 'block' });
                 } else bBox.style.display = 'none';
             }
@@ -260,7 +254,7 @@
                             const wZ = (col * step) + halfStep;
                             if (Math.abs(wX) > LIMIT || Math.abs(wZ) > LIMIT) continue;
 
-                            const posX = toX(wZ), posY = toY(wX);
+                            const posX = toX(wX), posY = toY(wZ);
                             if (inView(posX, posY, 100)) {
                                 const secId = `${r}|${getColumnLetter(col)}`;
                                 const key = `sector:${secId}`;
@@ -282,45 +276,45 @@
             const gridLayerId = 'grid';
             if (LayerManager.isVisible(gridLayerId, visStuds)) {
                 const dynStep = getDynamicStep(spp), edge = config.grid.labelEdgePadding;
-                const aZ = toX(0), aX = toY(0);
-                const axisX = Math.max(0, Math.min(aZ, w));
-                const axisY = Math.max(0, Math.min(aX, h));
-                const xLabelsGoRight = aZ <= 0;
-                const zLabelsGoUp = aX >= h;
+                const aX = toX(0), aZ = toY(0);
+                const axisZ = Math.max(0, Math.min(aX, w));
+                const axisX = Math.max(0, Math.min(aZ, h));
+                const xLabelsGoDown = aZ <= 0;
+                const zLabelsGoRight = aX <= 0;
 
                 if (w > 0 && h > 0) {
-                    for (let xVal = Math.ceil((c.x - halfVisH) / dynStep) * dynStep; xVal <= Math.floor((c.x + halfVisH) / dynStep) * dynStep; xVal += dynStep) {
+                    for (let xVal = Math.ceil(minVisX / dynStep) * dynStep; xVal <= Math.floor(maxVisX / dynStep) * dynStep; xVal += dynStep) {
                         if (Math.abs(xVal) > LIMIT) continue;
-                        const posY = toY(xVal);
-                        if (posY > edge && posY < h - edge) {
+                        const posX = toX(xVal);
+                        if (posX > edge && posX < w - edge) {
                             const key = `axis:x:${xVal}`;
                             activeLabelKeys.add(key);
                             const displayX = Math.round(xVal + coordinateOffset.x);
                             createLabel(
                                 key,
                                 `X ${displayX.toLocaleString()}`,
-                                xLabelsGoRight ? axisX + 8 : axisX - 8,
-                                posY,
-                                xLabelsGoRight ? 'translate(0, -50%)' : 'translate(-100%, -50%)'
+                                posX,
+                                axisX + (xLabelsGoDown ? 8 : -8),
+                                xLabelsGoDown ? 'translate(-50%, 0)' : 'translate(-50%, -100%)'
                             );
                         }
                     }
                 }
 
                 if (w > 0 && h > 0) {
-                    for (let zVal = Math.ceil((c.z - halfVisW) / dynStep) * dynStep; zVal <= Math.floor((c.z + halfVisW) / dynStep) * dynStep; zVal += dynStep) {
+                    for (let zVal = Math.ceil(minVisZ / dynStep) * dynStep; zVal <= Math.floor(maxVisZ / dynStep) * dynStep; zVal += dynStep) {
                         if (Math.abs(zVal) > LIMIT) continue;
-                        const posX = toX(zVal);
-                        if (posX > edge && posX < w - edge) {
+                        const posY = toY(zVal);
+                        if (posY > edge && posY < h - edge) {
                             const key = `axis:z:${zVal}`;
                             activeLabelKeys.add(key);
                             const displayZ = Math.round(zVal + coordinateOffset.z);
                             createLabel(
                                 key,
                                 `Z ${displayZ.toLocaleString()}`,
-                                posX,
-                                axisY + (zLabelsGoUp ? -8 : 8),
-                                zLabelsGoUp ? 'translate(-50%, -100%)' : 'translateX(-50%)'
+                                axisZ + (zLabelsGoRight ? 8 : -8),
+                                posY,
+                                zLabelsGoRight ? 'translate(0, -50%)' : 'translate(-100%, -50%)'
                             );
                         }
                     }
@@ -340,8 +334,8 @@
                     return;
                 }
 
-                const pointX = toX(point.z);
-                const pointY = toY(point.x);
+                const pointX = toX(point.x);
+                const pointY = toY(point.z);
                 container.style.display = '';
                 container.style.left = `${pointX}px`;
                 container.style.top = `${pointY}px`;

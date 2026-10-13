@@ -37,10 +37,37 @@
 
     const clamp = (val, min = -LIMIT, max = LIMIT) => Math.max(min, Math.min(max, val));
 
-    const toWorld = (sX, sY, r) => ({
-        z: clamp(Math.round(centerZ - ((sX - r.width * 0.5) * studsPerPixel))),
-        x: clamp(Math.round(centerX + ((sY - r.height * 0.5) * studsPerPixel)))
-    });
+    function getViewport(w = getRect().width, h = getRect().height) {
+        const halfWidth = w * 0.5;
+        const halfHeight = h * 0.5;
+        const centerCoords = { x: centerX, z: centerZ };
+        const bounds = {
+            minX: centerX - halfWidth * studsPerPixel,
+            maxX: centerX + halfWidth * studsPerPixel,
+            minZ: centerZ - halfHeight * studsPerPixel,
+            maxZ: centerZ + halfHeight * studsPerPixel
+        };
+
+        return {
+            width: w,
+            height: h,
+            centerCoords,
+            studsPerPixel,
+            visibleStuds: w * studsPerPixel,
+            bounds,
+            worldToScreen: ({ x, z }) => ({
+                x: halfWidth + ((x - centerCoords.x) / studsPerPixel),
+                y: halfHeight + ((z - centerCoords.z) / studsPerPixel)
+            }),
+            screenToWorld: ({ x, y }) => ({
+                x: clamp(Math.round(centerCoords.x + ((x - halfWidth) * studsPerPixel))),
+                z: clamp(Math.round(centerCoords.z + ((y - halfHeight) * studsPerPixel)))
+            })
+        };
+    }
+
+    const toWorld = (sX, sY, r) =>
+        getViewport(r.width, r.height).screenToWorld({ x: sX, y: sY });
 
     function getMinorStep(rawStep) {
         let pwr = 1;
@@ -85,20 +112,15 @@
         }
         gridCtx.clearRect(0, 0, w, h);
 
-        const invSpp = 1 / studsPerPixel;
-        const halfW = w * 0.5;
-        const halfH = h * 0.5;
-        const xOrigin = halfW + (centerZ * invSpp);
-        const yOrigin = halfH - (centerX * invSpp);
+        const viewport = getViewport(w, h);
+        const toScreenX = x => viewport.worldToScreen({ x, z: centerZ }).x;
+        const toScreenY = z => viewport.worldToScreen({ x: centerX, z }).y;
 
-        const toScreenX = z => xOrigin - (z * invSpp);
-        const toScreenY = x => yOrigin + (x * invSpp);
-
-        const bL = toScreenX(LIMIT), bR = toScreenX(-LIMIT);
-        const bT = toScreenY(LIMIT), bB = toScreenY(-LIMIT);
+        const bL = toScreenX(-LIMIT), bR = toScreenX(LIMIT);
+        const bT = toScreenY(-LIMIT), bB = toScreenY(LIMIT);
 
         const cL = Math.max(0, bL), cR = Math.min(w, bR);
-        const cT = Math.max(0, bB), cB = Math.min(h, bT);
+        const cT = Math.max(0, bT), cB = Math.min(h, bB);
         const bW = cR - cL, bH = cB - cT;
 
         const originX = toScreenX(0);
@@ -118,16 +140,13 @@
         setBorder(borders.top, bW > 0 && bT >= 0 && bT <= h, { left: `${cL}px`, top: `${bT}px`, width: `${bW}px`, height: '3px', transform: 'translateY(-50%)' });
         setBorder(borders.bottom, bW > 0 && bB >= 0 && bB <= h, { left: `${cL}px`, top: `${bB}px`, width: `${bW}px`, height: '3px', transform: 'translateY(-50%)' });
 
-        const visStuds = w * studsPerPixel;
+        const visStuds = viewport.visibleStuds;
         if (walls) walls.classList.toggle('hidden', visStuds > config.grid.maxVisibleStuds);
 
         const sectorGrid = visStuds >= config.grid.sectorViewMinStuds && visStuds <= config.grid.sectorViewMaxStuds;
         const minorStep = sectorGrid ? config.grid.sectorSize : getMinorStep(config.grid.regularLineSpacingStuds * studsPerPixel);
 
-        const minZ = centerZ - halfW * studsPerPixel;
-        const maxZ = centerZ + halfW * studsPerPixel;
-        const minX = centerX - halfH * studsPerPixel;
-        const maxX = centerX + halfH * studsPerPixel;
+        const { minX, maxX, minZ, maxZ } = viewport.bounds;
         const gridOffset = sectorGrid ? config.grid.sectorOffset : 0;
         const startIdxZ = Math.ceil(minZ / minorStep - gridOffset);
         const endIdxZ = Math.floor(maxZ / minorStep - gridOffset);
@@ -140,18 +159,14 @@
 
         const isMajorIndex = i => sectorGrid || i % 5 === 0;
 
-        // Single pass per axis: bucket each line into a minor/major Path2D
-        // instead of re-scanning the whole index range twice (once per pass,
-        // as the old two-pass version did). Halves the loop iterations for
-        // the same picture.
         const minorPath = new Path2D();
         const majorPath = new Path2D();
 
-        for (let i = startIdxZ; i <= endIdxZ; i++) {
-            const z = (i + gridOffset) * minorStep;
-            if (Math.abs(z) > LIMIT) continue;
+        for (let i = startIdxX; i <= endIdxX; i++) {
+            const x = (i + gridOffset) * minorStep;
+            if (Math.abs(x) > LIMIT) continue;
 
-            const sX = toScreenX(z);
+            const sX = toScreenX(x);
             if (sX < bL || sX > bR) continue;
 
             const path = isMajorIndex(i) ? majorPath : minorPath;
@@ -159,12 +174,12 @@
             path.lineTo(sX, cB);
         }
 
-        for (let i = startIdxX; i <= endIdxX; i++) {
-            const x = (i + gridOffset) * minorStep;
-            if (Math.abs(x) > LIMIT) continue;
+        for (let i = startIdxZ; i <= endIdxZ; i++) {
+            const z = (i + gridOffset) * minorStep;
+            if (Math.abs(z) > LIMIT) continue;
 
-            const sY = toScreenY(x);
-            if (sY < bB || sY > bT) continue;
+            const sY = toScreenY(z);
+            if (sY < bT || sY > bB) continue;
 
             const path = isMajorIndex(i) ? majorPath : minorPath;
             path.moveTo(cL, sY);
@@ -199,8 +214,8 @@
         ];
 
         studsPerPixel = clamp(studsPerPixel * (e.deltaY < 0 ? 1 / config.map.zoomFactor : config.map.zoomFactor), ...zoomLimits);
-        centerZ = clamp(target.z + ((e.clientX - r.left - r.width * 0.5) * studsPerPixel));
-        centerX = clamp(target.x - ((e.clientY - r.top - r.height * 0.5) * studsPerPixel));
+        centerX = clamp(target.x - ((e.clientX - r.left - r.width * 0.5) * studsPerPixel));
+        centerZ = clamp(target.z - ((e.clientY - r.top - r.height * 0.5) * studsPerPixel));
         applyTransform();
     };
 
@@ -216,8 +231,8 @@
 
     const handlePointerMove = (e) => {
         if (!dragging) return updateCoords(e.clientX, e.clientY);
-        centerZ = clamp(startCenterZ + ((e.clientX - startX) * studsPerPixel));
-        centerX = clamp(startCenterX - ((e.clientY - startY) * studsPerPixel));
+        centerX = clamp(startCenterX - ((e.clientX - startX) * studsPerPixel));
+        centerZ = clamp(startCenterZ - ((e.clientY - startY) * studsPerPixel));
         applyTransform();
         updateCoords(e.clientX, e.clientY);
     };
@@ -249,6 +264,7 @@
 
     window.MapEngine = {
         applyTransform,
+        getViewport,
         setLimit: (l) => { LIMIT = l || config.map.defaultLimit; },
         get studsPerPixel() { return studsPerPixel; },
         set studsPerPixel(val) { studsPerPixel = val; },
