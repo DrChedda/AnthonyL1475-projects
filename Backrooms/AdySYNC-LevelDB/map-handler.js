@@ -248,10 +248,6 @@
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(evt => mapSurface.addEventListener(evt, stopDrag));
     mapSurface.addEventListener('pointerleave', handlePointerLeave);
 
-    // ResizeObserver instead of window 'resize': catches container-only
-    // resizes (sidebar toggles, flex/grid reflow) that a window resize
-    // listener would miss, and is the single place that invalidates the
-    // cached rect from getRect().
     const resizeObserver = new ResizeObserver(() => {
         cachedRect = null;
         applyTransform();

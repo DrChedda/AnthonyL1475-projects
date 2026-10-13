@@ -243,24 +243,26 @@
             if (currentLevelData?.hasSectors && inSectorView && LayerManager.isVisible(sectorsLayerId, visStuds)) {
                 const step = config.grid.sectorSize;
                 const halfStep = step * 0.5;
-                const sR = Math.floor((minVisX + halfStep) / step), eR = Math.floor((maxVisX + halfStep) / step);
-                const sC = Math.floor((minVisZ + halfStep) / step), eC = Math.floor((maxVisZ + halfStep) / step);
+                const sR = Math.floor((minVisZ + halfStep) / step), eR = Math.floor((maxVisZ + halfStep) / step);
+                const sC = Math.floor((minVisX + halfStep) / step), eC = Math.floor((maxVisX + halfStep) / step);
 
                 const sectorCount = (eR - sR + 1) * (eC - sC + 1);
                 if (sectorCount <= config.grid.maxVisibleSectors) {
                     for (let r = sR; r <= eR; r++) {
                         for (let col = sC; col <= eC; col++) {
-                            const wX = (r * step) - halfStep;
-                            const wZ = (col * step) + halfStep;
+                            const wZ = (r * step) - halfStep;
+                            const wX = (col * step) - halfStep;
                             if (Math.abs(wX) > LIMIT || Math.abs(wZ) > LIMIT) continue;
 
                             const posX = toX(wX), posY = toY(wZ);
                             if (inView(posX, posY, 100)) {
                                 const secId = `${r}|${getColumnLetter(col)}`;
+                                const legacySecId = `${col}|${getColumnLetter(r)}`;
+                                const sectorName = sectorNamesData[secId] || sectorNamesData[legacySecId];
                                 const key = `sector:${secId}`;
                                 const lbl = getRenderedLabel(key, 'dynamic-axis-label sector-title-label');
                                 activeLabelKeys.add(key);
-                                lbl.textContent = `Sector ${sectorNamesData[secId] ? sectorNamesData[secId] + ` ${secId}` : secId}`;
+                                lbl.textContent = `${sectorName ? `${sectorName} Sector` : 'Sector'} ${secId}`;
 
                                 Object.assign(lbl.style, {
                                     left: `${posX}px`,
