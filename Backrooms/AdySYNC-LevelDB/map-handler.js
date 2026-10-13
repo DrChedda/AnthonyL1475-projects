@@ -13,6 +13,7 @@
 
     if (!mapSurface || !axisOverlay) return;
 
+    const config = window.MapConfig;
     const borders = {
         left: document.querySelector('.border-line--left'),
         right: document.querySelector('.border-line--right'),
@@ -25,7 +26,7 @@
     axisOverlay.appendChild(gridCanvas);
     const gridCtx = gridCanvas.getContext('2d');
 
-    let LIMIT = 1e9, centerX = 0, centerZ = 0, studsPerPixel = 10;
+    let LIMIT = config.map.defaultLimit, centerX = 0, centerZ = 0, studsPerPixel = config.map.fallbackStudsPerPixel;
     let coordinateOffset = { x: 0, z: 0 };
     let dragging = false, startX = 0, startY = 0, startCenterX = 0, startCenterZ = 0, isPending = false;
     let cachedRect = null;
@@ -118,22 +119,24 @@
         setBorder(borders.bottom, bW > 0 && bB >= 0 && bB <= h, { left: `${cL}px`, top: `${bB}px`, width: `${bW}px`, height: '3px', transform: 'translateY(-50%)' });
 
         const visStuds = w * studsPerPixel;
-        if (walls) walls.classList.toggle('hidden', visStuds > 2e7);
+        if (walls) walls.classList.toggle('hidden', visStuds > config.grid.maxVisibleStuds);
 
-        const sectorGrid = visStuds >= 5e5 && visStuds <= 2e7;
-        const minorStep = sectorGrid ? 2e6 : getMinorStep(120 * studsPerPixel);
+        const sectorGrid = visStuds >= config.grid.sectorViewMinStuds && visStuds <= config.grid.sectorViewMaxStuds;
+        const minorStep = sectorGrid ? config.grid.sectorSize : getMinorStep(config.grid.regularLineSpacingStuds * studsPerPixel);
 
         const minZ = centerZ - halfW * studsPerPixel;
         const maxZ = centerZ + halfW * studsPerPixel;
         const minX = centerX - halfH * studsPerPixel;
         const maxX = centerX + halfH * studsPerPixel;
-        const gridOffset = sectorGrid ? 0.5 : 0;
+        const gridOffset = sectorGrid ? config.grid.sectorOffset : 0;
         const startIdxZ = Math.ceil(minZ / minorStep - gridOffset);
         const endIdxZ = Math.floor(maxZ / minorStep - gridOffset);
         const startIdxX = Math.ceil(minX / minorStep - gridOffset);
         const endIdxX = Math.floor(maxX / minorStep - gridOffset);
 
-        if (endIdxZ - startIdxZ > 500 || endIdxX - startIdxX > 500 || bH <= 0 || bW <= 0) return;
+        if (endIdxZ - startIdxZ + 1 > config.grid.maxLinesPerAxis ||
+            endIdxX - startIdxX + 1 > config.grid.maxLinesPerAxis ||
+            bH <= 0 || bW <= 0) return;
 
         const isMajorIndex = i => sectorGrid || i % 5 === 0;
 
@@ -190,9 +193,12 @@
         e.preventDefault();
         const r = getRect();
         const target = toWorld(e.clientX - r.left, e.clientY - r.top, r);
-        const zoomLimits = [window.MapEngine?.minStudsPerPixel || 0.05, window.MapEngine?.maxStudsPerPixel || 4e6];
+        const zoomLimits = [
+            window.MapEngine?.minStudsPerPixel || config.map.minStudsPerPixel,
+            window.MapEngine?.maxStudsPerPixel || config.map.maxStudsPerPixel
+        ];
 
-        studsPerPixel = clamp(studsPerPixel * (e.deltaY < 0 ? 1 / 1.2 : 1.2), ...zoomLimits);
+        studsPerPixel = clamp(studsPerPixel * (e.deltaY < 0 ? 1 / config.map.zoomFactor : config.map.zoomFactor), ...zoomLimits);
         centerZ = clamp(target.z + ((e.clientX - r.left - r.width * 0.5) * studsPerPixel));
         centerX = clamp(target.x - ((e.clientY - r.top - r.height * 0.5) * studsPerPixel));
         applyTransform();
@@ -238,12 +244,12 @@
     resizeObserver.observe(mapSurface);
 
     const rect = getRect();
-    studsPerPixel = 20000 / (Math.min(rect.width, rect.height) || 800);
+    studsPerPixel = config.map.initialZoomStuds / (Math.min(rect.width, rect.height) || config.map.fallbackViewportSize);
     const initTimeout = setTimeout(applyTransform, 100);
 
     window.MapEngine = {
         applyTransform,
-        setLimit: (l) => { LIMIT = l || 1e9; },
+        setLimit: (l) => { LIMIT = l || config.map.defaultLimit; },
         get studsPerPixel() { return studsPerPixel; },
         set studsPerPixel(val) { studsPerPixel = val; },
         get centerCoords() { return { x: centerX, z: centerZ }; },

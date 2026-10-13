@@ -4,24 +4,25 @@
         window.MapUI.destroy();
     }
 
-    const AVAILABLE_LEVELS = [
-        { id: '0', label: 'Level 0' },
-        { id: '0.5', label: 'Level 0.5', parent: '0' },
-        { id: '1', label: 'Level 1' },
-        { id: '1.1', label: 'Level 1.1', parent: '1'},
-    ];
+    const { available: availableLevels, initialId } = window.MapConfig.levels;
 
     const sidebar = document.querySelector('.sidebar');
     const levelGroupContainer = document.querySelector('.level-btn-group');
     const mapControls = document.querySelector('.map-controls');
     const fullscreenButton = mapControls?.querySelector('[data-map-control="fullscreen"]');
 
-    let currentActiveLevel = '0';
+    let currentActiveLevel = initialId;
 
     function updateFullscreenButton() {
         if (!fullscreenButton) return;
         fullscreenButton.textContent = document.fullscreenElement ? 'Exit Fullscreen' : 'Fullscreen';
     }
+
+    const handleLevelWheel = (e) => {
+        if (e.deltaY === 0 || !levelGroupContainer) return;
+        e.preventDefault();
+        levelGroupContainer.scrollLeft += e.deltaY;
+    };
 
     const handleMapControlClick = async (e) => {
         const button = e.target.closest('[data-map-control]');
@@ -97,7 +98,7 @@
 
         const frag = document.createDocumentFragment();
 
-        AVAILABLE_LEVELS.forEach((lvl) => {
+        availableLevels.forEach((lvl) => {
             const btn = document.createElement('button');
             const isActive = lvl.id === currentActiveLevel;
             const isSublevel = Boolean(lvl.parent);
@@ -145,6 +146,7 @@
 
     if (levelGroupContainer) {
         levelGroupContainer.addEventListener('click', handleContainerClick);
+        levelGroupContainer.addEventListener('wheel', handleLevelWheel, { passive: false });
     }
     mapControls?.addEventListener('click', handleMapControlClick);
     document.addEventListener('fullscreenchange', updateFullscreenButton);
@@ -161,6 +163,7 @@
             document.removeEventListener('fullscreenchange', updateFullscreenButton);
             if (levelGroupContainer) {
                 levelGroupContainer.removeEventListener('click', handleContainerClick);
+                levelGroupContainer.removeEventListener('wheel', handleLevelWheel);
             }
             coordinateButton?.removeEventListener('click', handleCoordinateClick);
         }

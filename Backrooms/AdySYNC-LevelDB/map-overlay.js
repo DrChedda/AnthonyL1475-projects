@@ -10,6 +10,7 @@
     const labelsLayer = document.querySelector('.labels-layer');
 
     if (!wallsLayer) return;
+    const config = window.MapConfig;
     const LayerManager = (() => {
         const layers = new Map();
 
@@ -53,20 +54,11 @@
         return { define, isVisible, setEnabled, toggle, has, list };
     })();
 
-    LayerManager
-        .define('default',  { maxVisStuds: Infinity })       // always visible unless disabled
-        .define('walls',    { maxVisStuds: Infinity })
-        .define('overview', { maxVisStuds: Infinity })       // old: layer >= 2
-        .define('regional', { maxVisStuds: 2e7 })            // old: layer >= 1
-        .define('detail',   { maxVisStuds: 1e5 })            // old: layer 0 / undefined
-        .define('sectors',  { maxVisStuds: 2e7 })
-        .define('border',   { maxVisStuds: 2e7 })
-        .define('grid',     { maxVisStuds: Infinity });
+    config.layers.visibility.forEach(layer => LayerManager.define(layer.id, layer));
 
-    const LEGACY_NUMERIC_LAYER = { 0: 'detail', 1: 'regional', 2: 'overview' };
     function resolveLayerId(rawLayer) {
         if (rawLayer == null) return 'default';
-        if (typeof rawLayer === 'number') return LEGACY_NUMERIC_LAYER[rawLayer] ?? 'overview';
+        if (typeof rawLayer === 'number') return config.layers.legacyNumericIds[rawLayer] ?? 'overview';
         return rawLayer;
     }
 
@@ -79,8 +71,7 @@
     let wallsVisible = true, locationsVisible = true;
     const warnedWallColors = new Set();
     const renderedLabels = new Map();
-    const SECTOR_SIZE = 2e6;
-    const markerShapes = new Set(['circle', 'square', 'diamond', 'triangle', 'star', 'hexagon']);
+    const markerShapes = new Set(config.rendering.markerShapes);
 
     const columnLetterCache = new Map();
     const getColumnLetter = col => {
@@ -100,7 +91,7 @@
     };
 
     function getDynamicStep(spp) {
-        const ideal = 160 * spp;
+        const ideal = config.grid.dynamicLabelTargetPixels * spp;
         if (!ideal || !isFinite(ideal)) return 1e6;
         const mag = Math.pow(10, Math.floor(Math.log10(ideal)));
         const r = ideal / mag;
@@ -160,9 +151,11 @@
 
         const wallsLevelLayer = currentLevelData?.wallsLayer || 'walls';
         if (wallsVisible && wallData?.length > 0 && LayerManager.isVisible(wallsLevelLayer, visStuds)) {
-            const wallWidth = 3;
+            const wallWidth = config.rendering.wallWidth;
             ctx.lineWidth = wallWidth;
-            const defaultWallColor = '#4378c9';
+            ctx.lineCap = config.rendering.wallLineCap;
+            ctx.lineJoin = config.rendering.wallLineJoin;
+            const defaultWallColor = config.rendering.defaultWallColor;
 
             const wallVisible = p => {
                 if (!p || p.x == null || p.z == null || Math.abs(p.x) > LIMIT || Math.abs(p.z) > LIMIT) return false;
@@ -223,8 +216,8 @@
                         if (Math.max(p1X, p2X) < 0 || Math.min(p1X, p2X) > w ||
                             Math.max(p1Y, p2Y) < 0 || Math.min(p1Y, p2Y) > h) continue;
 
-                        getPath(next.color).moveTo(p1X, p1Y);
-                        getPath(next.color).lineTo(p2X, p2Y);
+                        getPath(curr.color).moveTo(p1X, p1Y);
+                        getPath(curr.color).lineTo(p2X, p2Y);
                     }
                 }
             }
@@ -251,13 +244,16 @@
             }
 
             const sectorsLayerId = currentLevelData?.sectorsLayer || 'sectors';
-            if (currentLevelData?.hasSectors && LayerManager.isVisible(sectorsLayerId, visStuds)) {
-                const step = SECTOR_SIZE;
+            const inSectorView = visStuds >= config.grid.sectorViewMinStuds &&
+                visStuds <= config.grid.sectorViewMaxStuds;
+            if (currentLevelData?.hasSectors && inSectorView && LayerManager.isVisible(sectorsLayerId, visStuds)) {
+                const step = config.grid.sectorSize;
                 const halfStep = step * 0.5;
                 const sR = Math.floor((minVisX + halfStep) / step), eR = Math.floor((maxVisX + halfStep) / step);
                 const sC = Math.floor((minVisZ + halfStep) / step), eC = Math.floor((maxVisZ + halfStep) / step);
 
-                if ((eR - sR) * (eC - sC) < 400) {
+                const sectorCount = (eR - sR + 1) * (eC - sC + 1);
+                if (sectorCount <= config.grid.maxVisibleSectors) {
                     for (let r = sR; r <= eR; r++) {
                         for (let col = sC; col <= eC; col++) {
                             const wX = (r * step) - halfStep;
@@ -285,7 +281,7 @@
 
             const gridLayerId = 'grid';
             if (LayerManager.isVisible(gridLayerId, visStuds)) {
-                const dynStep = getDynamicStep(spp), edge = 25;
+                const dynStep = getDynamicStep(spp), edge = config.grid.labelEdgePadding;
                 const aZ = toX(0), aX = toY(0);
                 const axisX = Math.max(0, Math.min(aZ, w));
                 const axisY = Math.max(0, Math.min(aX, h));
@@ -565,7 +561,7 @@
         pointsLayer.replaceChildren(fragment);
     }
 
-    function loadLevel(levelNum = 0) {
+    function loadLevel(levelNum = config.levels.initialId) {
         const requestVersion = ++levelLoadVersion;
         const levelFile = `levelData/level-${levelNum}.json`;
         fetch(`./${levelFile}`)
@@ -603,10 +599,10 @@
                 });
 
                 if (window.MapEngine) {
-                    const activeLimit = currentLevelData.limit || 1e9;
+                    const activeLimit = currentLevelData.limit || config.map.defaultLimit;
 
                     const mapRect = wallsLayer.parentElement.getBoundingClientRect();
-                    const minDim = Math.min(mapRect.width, mapRect.height) || 800;
+                    const minDim = Math.min(mapRect.width, mapRect.height) || config.map.fallbackViewportSize;
 
                     let maxWallDist = 0;
                     if (currentLevelData.walls?.length) {
@@ -621,11 +617,11 @@
                         });
                     }
 
-                    const effectiveWallDist = Math.max(maxWallDist, 500);
+                    const effectiveWallDist = Math.max(maxWallDist, config.map.minimumWallDistance);
 
-                    window.MapEngine.maxStudsPerPixel = ((currentLevelData.mapSize || activeLimit) * 2.2) / minDim;
-                    window.MapEngine.minStudsPerPixel = 0.05;
-                    window.MapEngine.studsPerPixel = (effectiveWallDist * 2.4) / minDim;
+                    window.MapEngine.maxStudsPerPixel = ((currentLevelData.mapSize || activeLimit) * config.map.maximumZoomPadding) / minDim;
+                    window.MapEngine.minStudsPerPixel = config.map.minStudsPerPixel;
+                    window.MapEngine.studsPerPixel = (effectiveWallDist * config.map.initialZoomPadding) / minDim;
 
                     window.MapEngine.onViewportChange = renderActiveViewportContent;
 
@@ -653,14 +649,14 @@
                 if (window.MapEngine) {
                     window.MapEngine.coordinateOffset = { x: 0, z: 0 };
                     window.MapEngine.centerCoords = { x: 0, z: 0 };
-                    window.MapEngine.setLimit(1e9);
+                    window.MapEngine.setLimit(config.map.defaultLimit);
                 }
                 if (coordTagEl) coordTagEl.textContent = `Level-${levelNum}`;
                 window.MapEngine?.applyTransform();
             });
     }
 
-    loadLevel(0);
+    loadLevel(config.levels.initialId);
 
     window.MapOverlay = {
         loadLevel,

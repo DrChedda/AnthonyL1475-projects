@@ -67,20 +67,9 @@
 
     <script src="https://p.trellocdn.com/embed.min.js"></script>
     <script src="popup-notification.js"></script>
+    <script src="app-config.js"></script>
     <script src="map-handler.js"></script>
     <script src="ui-controller.js"></script>
     <script src="map-overlay.js"></script>
-    <script>
-      const levelBtnGroup = document.querySelector('.level-btn-group');
-
-      if (levelBtnGroup) {
-          levelBtnGroup.addEventListener('wheel', (e) => {
-              if (e.deltaY !== 0) {
-                  e.preventDefault();
-                  levelBtnGroup.scrollLeft += e.deltaY;
-              }
-          }, { passive: false });
-      }
-    </script>
   </body>
 </html>
