@@ -1,0 +1,17 @@
+title: AnthonyL1475's Projects
+description: Portfolio and web projects from AnthonyL1475.
+url: "https://anthonyl1475.github.io"
+baseurl: ""
+permalink: pretty
+markdown: kramdown
+
+exclude:
+  - .git/
+  - .github/
+  - .vscode/
+  - node_modules/
+  - vendor/
+  - Gemfile
+  - Gemfile.lock
+  - .jekyll-cache/
+  - _site/

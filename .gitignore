@@ -11,3 +11,9 @@
 **/*.py
 **/__pycache__/
 **/*.pyc
+
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+vendor/
