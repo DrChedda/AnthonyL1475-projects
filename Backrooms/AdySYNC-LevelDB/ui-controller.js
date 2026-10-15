@@ -11,7 +11,25 @@
     const mapControls = document.querySelector('.map-controls');
     const fullscreenButton = mapControls?.querySelector('[data-map-control="fullscreen"]');
 
-    let currentActiveLevel = initialId;
+    function getLevelIdFromHash() {
+        const hash = window.location.hash.replace(/^#/, '').trim();
+        const match = hash.match(/^level-(.+)$/i);
+        return match ? decodeURIComponent(match[1]) : null;
+    }
+
+    function syncHashWithLevel(levelId) {
+        const nextHash = `#level-${levelId}`;
+        if (window.location.hash !== nextHash) {
+            window.history.replaceState(null, '', nextHash);
+        }
+    }
+
+    function resolveLevelId(levelId) {
+        const candidate = typeof levelId === 'string' ? levelId.trim() : '';
+        return availableLevels.some((lvl) => lvl.id === candidate) ? candidate : initialId;
+    }
+
+    let currentActiveLevel = resolveLevelId(getLevelIdFromHash() || initialId);
 
     function updateFullscreenButton() {
         if (!fullscreenButton) return;
@@ -117,8 +135,22 @@
         const btn = e.target.closest('.ui-level-btn');
         if (!btn) return;
 
-        const levelId = btn.getAttribute('data-level');
+        const levelId = resolveLevelId(btn.getAttribute('data-level'));
         if (!levelId || levelId === currentActiveLevel) return;
+
+        currentActiveLevel = levelId;
+        syncHashWithLevel(levelId);
+
+        if (window.MapOverlay?.loadLevel) {
+            window.MapOverlay.loadLevel(levelId);
+        }
+
+        renderLevelButtons();
+    };
+
+    const handleHashChange = () => {
+        const levelId = resolveLevelId(getLevelIdFromHash() || initialId);
+        if (levelId === currentActiveLevel) return;
 
         currentActiveLevel = levelId;
 
@@ -150,10 +182,12 @@
     }
     mapControls?.addEventListener('click', handleMapControlClick);
     document.addEventListener('fullscreenchange', updateFullscreenButton);
+    window.addEventListener('hashchange', handleHashChange);
     updateFullscreenButton();
     const coordinateButton = sidebar?.querySelector('.sidebar-coordinate-readout');
     coordinateButton?.addEventListener('click', handleCoordinateClick);
 
+    syncHashWithLevel(currentActiveLevel);
     renderLevelButtons();
 
     window.MapUI = {
@@ -161,6 +195,7 @@
         destroy: () => {
             mapControls?.removeEventListener('click', handleMapControlClick);
             document.removeEventListener('fullscreenchange', updateFullscreenButton);
+            window.removeEventListener('hashchange', handleHashChange);
             if (levelGroupContainer) {
                 levelGroupContainer.removeEventListener('click', handleContainerClick);
                 levelGroupContainer.removeEventListener('wheel', handleLevelWheel);
