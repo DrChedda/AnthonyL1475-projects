@@ -18,7 +18,7 @@ if (isEntityMode) {
   document.title = "Classic Entities | AdyGuessr";
   elements.modeLabel.textContent = "Classic Entities";
   elements.questionTitle.textContent = "Which entity is this?";
-  elements.playAgain.href = "classic.html?mode=entities";
+  elements.playAgain.href = `${window.location.pathname}?mode=entities`;
 }
 
 function showWarning(message) {

@@ -430,7 +430,7 @@ window.addEventListener("load", () => {
           if (i >= feedbackMessages.length) {
             state.beginningfinished = true;
             saveGame();
-            window.location.href = "chapter1/index.html";
+            window.location.href = "chapter1/";
             return;
           }
 

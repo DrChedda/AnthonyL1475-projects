@@ -126,6 +126,6 @@ window.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.key === ".") {
     state.beginningfinished = true;
     saveGame();
-    window.location.href = "chapter1/index.html";
+    window.location.href = "chapter1/";
   }
 });

@@ -452,7 +452,7 @@ window.addEventListener("load", () => {
 			showFeedback("All data wiped!");
 			closeConfirmBar(confirmYesFull);
 
-			window.location.href = "../index.html";
+			window.location.href = "../";
 		});
 	}
 

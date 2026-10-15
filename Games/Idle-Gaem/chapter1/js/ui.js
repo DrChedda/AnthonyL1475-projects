@@ -140,7 +140,7 @@ window.addEventListener("load", () => {
 	el.btnYesFull?.addEventListener("click", () => {
 		localStorage.clear();
 		closeConfirmBar(el.btnYesFull);
-		window.location.href = "../index.html";
+		window.location.href = "../";
 	});
 
 	el.btnNo?.addEventListener("click", () => closeConfirmBar(el.btnNo));
