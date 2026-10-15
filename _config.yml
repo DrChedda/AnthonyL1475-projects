@@ -1,9 +1,12 @@
 title: AnthonyL1475's Projects
 description: Portfolio and web projects from AnthonyL1475.
-url: "https://anthonyl1475.github.io"
-baseurl: ""
+url: "https://drchedda.github.io"
+baseurl: "/AnthonyL1475-projects"
 permalink: pretty
 markdown: kramdown
+
+plugins:
+  - jekyll-redirect-from
 
 exclude:
   - .git/
