@@ -12,9 +12,9 @@
     const fullscreenButton = mapControls?.querySelector('[data-map-control="fullscreen"]');
 
     function getLevelIdFromUrl() {
-        const hash = window.location.hash.replace(/^#/, '').trim();
-        const hashMatch = hash.match(/^level-(.+)$/i);
-        if (hashMatch) return decodeURIComponent(hashMatch[1]);
+        const params = new URLSearchParams(window.location.search);
+        const queryLevel = params.get('level') || params.get('lvl');
+        if (queryLevel) return queryLevel.trim();
 
         const pathname = window.location.pathname.replace(/\/+$/, '');
         const pathSegments = pathname.split('/').filter(Boolean);
@@ -22,16 +22,18 @@
         const pathMatch = lastSegment.match(/^level[-_ ](.+)$/i);
         if (pathMatch) return decodeURIComponent(pathMatch[1]);
 
-        const searchMatch = window.location.search.match(/[?&](?:level|lvl)[-_ ]?=([^&]+)/i);
-        if (searchMatch) return decodeURIComponent(searchMatch[1]);
-
         return null;
     }
 
-    function syncHashWithLevel(levelId) {
-        const nextHash = `#level-${levelId}`;
-        if (window.location.hash !== nextHash) {
-            window.history.replaceState(null, '', `${window.location.pathname}${nextHash}`);
+    function syncUrlWithLevel(levelId) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('lvl');
+        url.searchParams.set('level', levelId);
+        url.hash = '';
+
+        const nextUrl = `${url.pathname}${url.search}`;
+        if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== nextUrl) {
+            window.history.replaceState(null, '', nextUrl);
         }
     }
 
@@ -150,7 +152,7 @@
         if (!levelId || levelId === currentActiveLevel) return;
 
         currentActiveLevel = levelId;
-        syncHashWithLevel(levelId);
+        syncUrlWithLevel(levelId);
 
         if (window.MapOverlay?.loadLevel) {
             window.MapOverlay.loadLevel(levelId);
@@ -159,7 +161,7 @@
         renderLevelButtons();
     };
 
-    const handleHashChange = () => {
+    const handleUrlChange = () => {
         const levelId = resolveLevelId(getLevelIdFromUrl() || initialId);
         if (levelId === currentActiveLevel) return;
 
@@ -193,12 +195,12 @@
     }
     mapControls?.addEventListener('click', handleMapControlClick);
     document.addEventListener('fullscreenchange', updateFullscreenButton);
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleUrlChange);
     updateFullscreenButton();
     const coordinateButton = sidebar?.querySelector('.sidebar-coordinate-readout');
     coordinateButton?.addEventListener('click', handleCoordinateClick);
 
-    syncHashWithLevel(currentActiveLevel);
+    syncUrlWithLevel(currentActiveLevel);
     renderLevelButtons();
 
     window.MapUI = {
@@ -206,7 +208,7 @@
         destroy: () => {
             mapControls?.removeEventListener('click', handleMapControlClick);
             document.removeEventListener('fullscreenchange', updateFullscreenButton);
-            window.removeEventListener('hashchange', handleHashChange);
+            window.removeEventListener('popstate', handleUrlChange);
             if (levelGroupContainer) {
                 levelGroupContainer.removeEventListener('click', handleContainerClick);
                 levelGroupContainer.removeEventListener('wheel', handleLevelWheel);
