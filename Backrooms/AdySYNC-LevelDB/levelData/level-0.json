@@ -156,7 +156,7 @@
     ],
     "sectors":  {
         "0|A": "Beacon",
-        "-77|-BZ": "Capital"    
+        "-77|-M": "Capital"    
     },
     "worldBorder": 2100000,
     "locations": [
@@ -169,7 +169,7 @@
             "description": "Its beacon there is a beacon icon visible from across the inside of the infinitelands walls."
         },
         {
-            "x": -154000000,
+            "x": -24000000,
             "z": -154000000,
             "name": "Western M.E.G. Capital?",
             "color": "orange",
