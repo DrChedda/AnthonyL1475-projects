@@ -11,16 +11,27 @@
     const mapControls = document.querySelector('.map-controls');
     const fullscreenButton = mapControls?.querySelector('[data-map-control="fullscreen"]');
 
-    function getLevelIdFromHash() {
+    function getLevelIdFromUrl() {
         const hash = window.location.hash.replace(/^#/, '').trim();
-        const match = hash.match(/^level-(.+)$/i);
-        return match ? decodeURIComponent(match[1]) : null;
+        const hashMatch = hash.match(/^level-(.+)$/i);
+        if (hashMatch) return decodeURIComponent(hashMatch[1]);
+
+        const pathname = window.location.pathname.replace(/\/+$/, '');
+        const pathSegments = pathname.split('/').filter(Boolean);
+        const lastSegment = pathSegments[pathSegments.length - 1] || '';
+        const pathMatch = lastSegment.match(/^level[-_ ](.+)$/i);
+        if (pathMatch) return decodeURIComponent(pathMatch[1]);
+
+        const searchMatch = window.location.search.match(/[?&](?:level|lvl)[-_ ]?=([^&]+)/i);
+        if (searchMatch) return decodeURIComponent(searchMatch[1]);
+
+        return null;
     }
 
     function syncHashWithLevel(levelId) {
         const nextHash = `#level-${levelId}`;
         if (window.location.hash !== nextHash) {
-            window.history.replaceState(null, '', nextHash);
+            window.history.replaceState(null, '', `${window.location.pathname}${nextHash}`);
         }
     }
 
@@ -29,7 +40,7 @@
         return availableLevels.some((lvl) => lvl.id === candidate) ? candidate : initialId;
     }
 
-    let currentActiveLevel = resolveLevelId(getLevelIdFromHash() || initialId);
+    let currentActiveLevel = resolveLevelId(getLevelIdFromUrl() || initialId);
 
     function updateFullscreenButton() {
         if (!fullscreenButton) return;
@@ -149,7 +160,7 @@
     };
 
     const handleHashChange = () => {
-        const levelId = resolveLevelId(getLevelIdFromHash() || initialId);
+        const levelId = resolveLevelId(getLevelIdFromUrl() || initialId);
         if (levelId === currentActiveLevel) return;
 
         currentActiveLevel = levelId;
