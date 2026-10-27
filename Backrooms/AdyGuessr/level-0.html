@@ -10,13 +10,13 @@ redirect_from:
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://amqzikqtsvtbqluibkzo.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self';">
   <title>Level-0 Map | AdyGuessr</title>
-  <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="{{ '/Backrooms/AdyGuessr/icon.png' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/Backrooms/AdyGuessr/styles.css' | relative_url }}">
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
-      <div class="brand"><img src="icon.png" alt="" class="brand-logo"><a class="brand-name" href="{{ '/Backrooms/AdyGuessr/' | relative_url }}?mode=level-0">AdyGuessr</a></div>
+      <div class="brand"><img src="{{ '/Backrooms/AdyGuessr/icon.png' | relative_url }}" alt="" class="brand-logo"><a class="brand-name" href="{{ '/Backrooms/AdyGuessr/' | relative_url }}?mode=level-0">AdyGuessr</a></div>
       <div class="round-status" id="round-status" aria-live="polite"><span class="status-dot"></span><span id="round-label">Round 1</span></div>
       <div class="score-panel" id="score-panel"><span class="score-label">Current score</span><strong id="score">0</strong><span class="score-unit">pts</span></div>
     </header>
@@ -30,11 +30,11 @@ redirect_from:
     </section>
     <section class="review-screen" id="review-screen" hidden aria-labelledby="review-title"><p class="eyebrow">Game review</p><h1 id="review-title">Game complete</h1><div class="review-summary"><strong id="review-score">0</strong><span>points</span><span class="review-divider">|</span><strong id="review-correct">0/0</strong><span>correct</span></div><div class="review-list" id="review-list"></div><form class="leaderboard-submit" id="leaderboard-submit"><p class="submission-notice">Use your real Roblox username, the one shown in the main Discord server, or your submission will be removed.</p><label for="player-name">Submit your score</label><div><input id="player-name" name="playerName" maxlength="24" placeholder="Your name" required><button class="secondary-button" type="submit">Submit</button></div></form><div class="review-actions"><a class="secondary-button" href="{{ '/Backrooms/AdyGuessr/level-0/' | relative_url }}">Play again</a><a class="back-button" href="{{ '/Backrooms/AdyGuessr/' | relative_url }}?mode=level-0">Back to modes</a></div></section>
   </main>
-  <script src="map-handler.js"></script>
-  <script src="map-overlay.js"></script>
+  <script src="{{ '/Backrooms/AdyGuessr/map-handler.js' | relative_url }}"></script>
+  <script src="{{ '/Backrooms/AdyGuessr/map-overlay.js' | relative_url }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
-  <script src="supabase-client.js"></script>
-  <script type="module" src="name-filter.js"></script>
-  <script src="level-0.js" defer></script>
+  <script src="{{ '/Backrooms/AdyGuessr/supabase-client.js' | relative_url }}"></script>
+  <script type="module" src="{{ '/Backrooms/AdyGuessr/name-filter.js' | relative_url }}"></script>
+  <script src="{{ '/Backrooms/AdyGuessr/level-0.js' | relative_url }}" defer></script>
 </body>
 </html>
