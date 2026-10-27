@@ -78,12 +78,12 @@ function renderRound() {
   elements.questionTitle.textContent = location.question;
   elements.sceneNumber.textContent = String(state.currentRound + 1).padStart(2, "0");
   elements.sceneImage.style.backgroundImage = "none";
-  state.image = location.image || "";
-  if (location.image) {
+  state.image = location.image ? new URL(location.image, assetBaseUrl).href : "";
+  if (state.image) {
     const image = new Image();
-    image.onload = () => { elements.sceneImage.style.backgroundImage = `url("${location.image}")`; };
+    image.onload = () => { elements.sceneImage.style.backgroundImage = `url("${state.image}")`; };
     image.onerror = () => showWarning("The image for this question could not be loaded.");
-    image.src = new URL(location.image, assetBaseUrl);
+    image.src = state.image;
   }
   elements.answerList.innerHTML = "";
   shuffle(location.answers).forEach((choice, index) => {
