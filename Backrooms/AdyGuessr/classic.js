@@ -1,6 +1,7 @@
 const mode = new URLSearchParams(window.location.search).get("mode") || "locations";
 const leaderboardMode = mode === "locations" ? "locations" : mode;
 const isEntityMode = mode === "entities";
+const assetBaseUrl = new URL(document.querySelector(".app-shell").dataset.assetBase, window.location.origin);
 const state = { locations: [], currentRound: 0, score: 0, answered: false, roundLimit: 0, image: "", answers: [], roundStartedAt: 0 };
 const elements = {
   game: document.querySelector("#game-grid"), warning: document.querySelector("#load-warning"), roundStatus: document.querySelector("#round-status"),
@@ -48,7 +49,7 @@ function validateLocations(locations) {
 }
 
 async function loadJsonFile(fileName) {
-  const response = await fetch(`config/${fileName}`);
+  const response = await fetch(new URL(`config/${fileName}`, assetBaseUrl));
   if (!response.ok) throw new Error(`${fileName} could not be loaded`);
   return validateLocations(await response.json());
 }
@@ -82,7 +83,7 @@ function renderRound() {
     const image = new Image();
     image.onload = () => { elements.sceneImage.style.backgroundImage = `url("${location.image}")`; };
     image.onerror = () => showWarning("The image for this question could not be loaded.");
-    image.src = location.image;
+    image.src = new URL(location.image, assetBaseUrl);
   }
   elements.answerList.innerHTML = "";
   shuffle(location.answers).forEach((choice, index) => {

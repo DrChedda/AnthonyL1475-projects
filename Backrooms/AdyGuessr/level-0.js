@@ -1,5 +1,6 @@
 const state = { questions: [], currentRound: 0, score: 0, answered: false, guess: null, answers: [] };
 const QUESTION_LIMIT = 20;
+const assetBaseUrl = new URL(document.querySelector(".app-shell").dataset.assetBase, window.location.origin);
 const elements = {
   game: document.querySelector("#game-grid"), warning: document.querySelector("#load-warning"), roundLabel: document.querySelector("#round-label"), score: document.querySelector("#score"),
   questionTitle: document.querySelector("#question-title"), sceneNumber: document.querySelector("#scene-number"), guessLayer: document.querySelector(".guess-layer"), result: document.querySelector("#result-card"),
@@ -142,7 +143,7 @@ async function submitScore(event) {
 
 async function startGame() {
   try {
-    const response = await fetch("config/level-0-questions.json");
+    const response = await fetch(new URL("config/level-0-questions.json", assetBaseUrl));
     if (!response.ok) throw new Error("Level-0 questions could not be loaded");
     state.questions = shuffle(await response.json()).slice(0, QUESTION_LIMIT);
     if (!state.questions.length) throw new Error("No Level-0 questions configured");

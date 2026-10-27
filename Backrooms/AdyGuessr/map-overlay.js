@@ -6,6 +6,7 @@
 
     const wallsLayer = document.querySelector('.walls-layer');
     const pointsLayer = document.querySelector('.points-layer');
+    const assetBaseUrl = new URL(document.querySelector('.app-shell').dataset.assetBase, window.location.origin);
 
     if (!wallsLayer) return;
 
@@ -161,7 +162,7 @@
     }
 
     function loadLevel(levelNum = 0) {
-        fetch(`config/level-0-map.json`)
+        fetch(new URL('config/level-0-map.json', assetBaseUrl))
             .then(res => res.ok ? res.json() : Promise.reject(`Level data missing for level-${levelNum}`))
             .then(data => {
                 currentLevelData = data.autoCenter ? centerLevelData(data) : data;

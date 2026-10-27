@@ -14,7 +14,7 @@ redirect_from:
   <link rel="stylesheet" href="{{ '/Backrooms/AdyGuessr/styles.css' | relative_url }}">
 </head>
 <body>
-  <main class="app-shell">
+  <main class="app-shell" data-asset-base="{{ '/Backrooms/AdyGuessr/' | relative_url }}">
     <header class="topbar">
       <div class="brand"><img src="{{ '/Backrooms/AdyGuessr/icon.png' | relative_url }}" alt="" class="brand-logo"><a class="brand-name" href="{{ '/Backrooms/AdyGuessr/' | relative_url }}">AdyGuessr</a></div>
       <div class="round-status" id="round-status" aria-live="polite" hidden><span class="status-dot"></span><span id="round-label">Round 1</span></div>
